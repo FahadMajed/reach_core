@@ -8,8 +8,18 @@ class Formatter {
   static String formatTimeId() =>
       Timestamp.now().millisecondsSinceEpoch.toString();
 
-  static String parseDateNoTime(String dateTime) {
-    if (dateTime.contains('Date')) return dateTime.tr;
+  static String formatResearchId(String researcherId) =>
+      researcherId + Timestamp.now().millisecondsSinceEpoch.toString();
+
+  static String formatGroupId({required String title, required int number}) =>
+      "Group 1 - $title - ${formatTimeId()}";
+
+  static String? parseDateNoTime(String? dateTime) {
+    if (dateTime == null) {
+      return null;
+    } else if (dateTime.contains('Date')) {
+      return dateTime.tr;
+    }
 
     DateTime? date = DateTime.tryParse(dateTime);
 
@@ -79,6 +89,8 @@ class Formatter {
     }
 
     return '$day, $month ${date?.day}';
+
+    return null;
   }
 
   static String parseDate(String dateTime) {
@@ -163,7 +175,7 @@ class Formatter {
             : date.day == 3
                 ? 'rd'
                 : 'th';
-    return '$day, $month ${date.day}, $time';
+    return '$day, $month ${date.day}$prefix, $time';
   }
 
   static String formatSinceLastMessage(Timestamp chatLastMessageDate) {
@@ -177,7 +189,7 @@ class Formatter {
                 : duration.inDays.toString() + "d".tr;
   }
 
-  /// get the difference betwee starts and ends in munites
+  /// get the difference between starts and ends in minutes
   static int formatDuration(String starts, String ends) {
     DateTime start = DateTime.parse(starts);
     int startsHours = start.hour;

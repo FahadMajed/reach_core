@@ -8,11 +8,12 @@ class SelectableContainer extends ConsumerWidget {
   final Function() onPressed;
   final bool isChosen;
   const SelectableContainer({
+    Key? key,
     required this.icon,
     required this.isChosen,
     required this.onPressed,
     required this.text,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context, ref) {
@@ -47,11 +48,11 @@ class SelectableContainer extends ConsumerWidget {
                     style: isChosen ? selectedText : descSmallBlack,
                   ),
                   isChosen
-                      ? Icon(
+                      ? const Icon(
                           Icons.check_outlined,
                           color: Colors.white,
                         )
-                      : Icon(
+                      : const Icon(
                           Icons.add,
                           color: darkBlue,
                         ),

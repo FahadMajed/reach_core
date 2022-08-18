@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 abstract class DatabaseRepository<T> {
   ///returns T with its document id with it
-  Future<T?> createDocument(T object);
+  Future<void> createDocument(T object);
 
   // Future<T> createSubDocument(T object);
 

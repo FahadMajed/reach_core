@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 class LetterAvatar extends StatelessWidget {
   const LetterAvatar({
+    Key? key,
     required this.color,
     required this.title,
     this.dimension = 60,
-  });
+  }) : super(key: key);
 
   final int color;
   final String title;

@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reach_core/core/core.dart';
 
-enum IconLabelStyle { Med, Small, Large, MedBold, SmallBold, LargeBold }
+enum IconLabelStyle { med, small, large, medBold, smallBold, largeBold }
 
 final Map<IconLabelStyle, TextStyle> iconLabels = {
-  IconLabelStyle.Med: iconLabelMid,
-  IconLabelStyle.Small: iconLabelSmall,
-  IconLabelStyle.Large: iconLabelLarge,
-  IconLabelStyle.MedBold: iconLabelMidBoldDark,
-  IconLabelStyle.SmallBold: iconLabelSmallBold,
-  IconLabelStyle.LargeBold: iconLabelLargeBold
+  IconLabelStyle.med: iconLabelMid,
+  IconLabelStyle.small: iconLabelSmall,
+  IconLabelStyle.large: iconLabelLarge,
+  IconLabelStyle.medBold: iconLabelMidBoldDark,
+  IconLabelStyle.smallBold: iconLabelSmallBold,
+  IconLabelStyle.largeBold: iconLabelLargeBold
 };
 
 class IconWithText extends StatelessWidget {
@@ -22,11 +22,12 @@ class IconWithText extends StatelessWidget {
   final IconLabelStyle? style;
 
   const IconWithText({
+    Key? key,
     required this.icon,
     required this.text,
     this.style,
     this.direction = Axis.horizontal,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -56,11 +57,12 @@ class IconWithRichText extends StatelessWidget {
   final TextStyle? style;
 
   const IconWithRichText({
+    Key? key,
     required this.icon,
     required this.richText,
     this.style,
     this.direction = Axis.horizontal,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

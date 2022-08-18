@@ -9,11 +9,12 @@ class TabsBar extends StatelessWidget {
   final Function(int?)? callBack;
   final RxList<bool>? tabBarValue;
   const TabsBar({
+    Key? key,
     this.tabBarElements = const [],
     this.groupValue,
     this.callBack,
     this.tabBarValue,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class TabsBar extends StatelessWidget {
         padding: const EdgeInsets.only(top: 6),
         child: Row(
           children: [
-            Spacer(
+            const Spacer(
               flex: 2,
             ),
             Expanded(
@@ -48,7 +49,7 @@ class TabsBar extends StatelessWidget {
                 },
               ),
             ),
-            Spacer(
+            const Spacer(
               flex: 2,
             ),
           ],
@@ -62,7 +63,11 @@ class TabBarTab extends StatelessWidget {
   final String text;
   final int val;
 
-  const TabBarTab(this.text, this.val);
+  const TabBarTab(
+    this.text,
+    this.val, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

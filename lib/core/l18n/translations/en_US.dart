@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 final Map<String, String> en = {
   "app_name": "Reach",
   "app_name_caps": "REACH",

@@ -5,7 +5,10 @@ import 'package:reach_core/core/core.dart';
 class EmptyIndicator extends StatelessWidget {
   final String message;
 
-  const EmptyIndicator(this.message);
+  const EmptyIndicator(
+    this.message, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

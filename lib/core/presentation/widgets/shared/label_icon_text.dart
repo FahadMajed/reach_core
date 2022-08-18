@@ -7,10 +7,11 @@ class LabelIconText extends StatelessWidget {
   final String text;
 
   const LabelIconText({
+    Key? key,
     required this.label,
     required this.iconData,
     required this.text,
-  });
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Column(

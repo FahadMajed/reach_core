@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reach_core/core/core.dart';
-import 'package:reach_core/core/theme/theme.dart';
 
 class BottomButton extends StatelessWidget {
   final Function() onPressed;

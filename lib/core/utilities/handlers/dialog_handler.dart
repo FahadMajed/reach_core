@@ -30,7 +30,8 @@ class DialogHandler {
             TextButton(
               child: Text(
                 okText,
-                style: isDestructive ? TextStyle(color: Colors.red) : null,
+                style:
+                    isDestructive ? const TextStyle(color: Colors.red) : null,
               ),
               onPressed: () {
                 if (onOK != null) onOK();
@@ -50,17 +51,14 @@ class DialogHandler {
               CupertinoDialogAction(
                 child: Text(cancelText.tr),
                 onPressed: () {
-                  if (onCancel != null) {
-                    onCancel();
-                  } else {
-                    Get.close(1);
-                  }
+                  onCancel();
                 },
               ),
             CupertinoDialogAction(
               child: Text(
                 okText.tr,
-                style: isDestructive ? TextStyle(color: Colors.red) : null,
+                style:
+                    isDestructive ? const TextStyle(color: Colors.red) : null,
               ),
               onPressed: () {
                 if (onOK != null) {

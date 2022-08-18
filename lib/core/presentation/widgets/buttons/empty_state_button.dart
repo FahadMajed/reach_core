@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reach_core/core/core.dart';
-import 'package:reach_core/core/theme/theme.dart';
 
 class EmptyStateButton extends StatelessWidget {
   final String text;
@@ -10,10 +9,12 @@ class EmptyStateButton extends StatelessWidget {
   final IconData iconData;
 
   const EmptyStateButton(
-      {required this.text,
+      {Key? key,
+      required this.text,
       required this.buttonTitle,
       required this.iconData,
-      required this.onPressed});
+      required this.onPressed})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class EmptyStateButton extends StatelessWidget {
         FilledButton(
           title: buttonTitle.tr,
           onPressed: onPressed,
-          style: FilledButtonStyle.Accent,
+          style: FilledButtonStyle.accent,
         )
       ],
     );

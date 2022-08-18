@@ -1,7 +1,5 @@
 // ignore_for_file: empty_catches
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reach_core/core/core.dart';
 import 'package:reach_research/research.dart';
 
@@ -9,23 +7,20 @@ class ParticipantsRepository
     implements
         DatabaseRepository<Participant>,
         SubCollectionRepository<List<Answer>> {
-  final FirebaseFirestore _database;
-  late CollectionReference<Participant> collection;
+  late final CollectionReference<Participant> collection;
 
-  ParticipantsRepository(
-    this._database,
-  ) {
-    collection =
-        _database.collection("participants").withConverter<Participant>(
-              fromFirestore: (snapshot, _) =>
-                  Participant.fromFirestore(snapshot.data()!),
-              toFirestore: (model, _) => model.toMap(),
-            );
+  ParticipantsRepository(FirebaseFirestore database) {
+    collection = database.collection("participants").withConverter<Participant>(
+          fromFirestore: (snapshot, _) => snapshot.data() == null
+              ? Participant.empty()
+              : Participant(snapshot.data()!),
+          toFirestore: (model, _) => model.toMap(),
+        );
   }
 
   @override
   Future<Participant> getDocument(String id) =>
-      collection.doc(id).get().then((doc) => doc.data()!);
+      collection.doc(id).get().then((doc) => doc.data() ?? Participant.empty());
 
   @override
   Future<Participant?> createDocument(Participant participant) async {

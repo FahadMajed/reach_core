@@ -21,10 +21,11 @@ class ReachTextField extends StatelessWidget {
   final bool autoFocus;
   final TextInputAction action;
   final double height;
-  final textAlign;
+  final TextAlign textAlign;
 
   const ReachTextField(
       {this.focusNode,
+      Key? key,
       this.height = 55,
       this.textAlign = TextAlign.start,
       this.controller,
@@ -42,7 +43,8 @@ class ReachTextField extends StatelessWidget {
       this.maxLines = 1,
       this.autoFocus = false,
       this.action = TextInputAction.next,
-      this.maxLength});
+      this.maxLength})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +66,7 @@ class ReachTextField extends StatelessWidget {
         // hintStyle: hintStyle == null ? descSmall : hintStyle,
         filled: true,
         fillColor: Colors.white,
-        border: OutlineInputBorder(
+        border: const OutlineInputBorder(
           borderRadius: radius,
           borderSide: BorderSide(color: Colors.black, width: 0.5),
         ),

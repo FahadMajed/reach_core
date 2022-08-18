@@ -4,7 +4,10 @@ import 'package:reach_core/core/theme/theme.dart';
 class BorderedContainer extends StatelessWidget {
   final Widget child;
 
-  const BorderedContainer({required this.child});
+  const BorderedContainer({
+    Key? key,
+    required this.child,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

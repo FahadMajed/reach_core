@@ -4,7 +4,11 @@ class BackgroundImage extends StatelessWidget {
   final List<Widget> children;
   final String relativePath;
 
-  const BackgroundImage({required this.relativePath, required this.children});
+  const BackgroundImage({
+    Key? key,
+    required this.relativePath,
+    required this.children,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

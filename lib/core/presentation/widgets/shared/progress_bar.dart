@@ -8,9 +8,10 @@ class AnimatedProgressBar extends StatelessWidget {
 
   const AnimatedProgressBar({
     required this.value,
+    Key? key,
     this.height = 17,
     this.color = selectedColor,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class AnimatedProgressBar extends StatelessWidget {
                 ),
               ),
               AnimatedContainer(
-                duration: Duration(milliseconds: 800),
+                duration: const Duration(milliseconds: 800),
                 curve: Curves.easeOutCubic,
                 height: height,
                 width: box.maxWidth * _floor(value),

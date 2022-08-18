@@ -11,11 +11,13 @@ class AssetImageContainer extends StatelessWidget {
 
   const AssetImageContainer(
       {required this.image,
+      Key? key,
       this.width = double.infinity,
       this.height = 240,
       this.padding = const EdgeInsets.all(5),
       this.onTapped,
-      this.borderless = false});
+      this.borderless = false})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

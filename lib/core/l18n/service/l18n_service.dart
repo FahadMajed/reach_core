@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
-import '../translations/en_US.dart';
 
 import '../translations/ar_SA.dart';
+import '../translations/en_US.dart';
 
 class TranslationService extends Translations {
-  static final enlocal = Locale("en", "SA");
-  static final arlocal = Locale("ar", "SA");
+  static const enLocal = Locale("en", "SA");
+  static const arLocal = Locale("ar", "SA");
 
-  static final Map locales = {"English": enlocal, "Arabic": arlocal};
+  static final Map locales = {"English": enLocal, "Arabic": arLocal};
 
   @override
   Map<String, Map<String, String>> get keys => {
@@ -19,7 +19,7 @@ class TranslationService extends Translations {
 
   static void changeLocale(String lang) => Get.updateLocale(locales[lang]);
 
-  static bool isEnglish() => Get.deviceLocale == enlocal;
+  static bool isEnglish() => Get.deviceLocale == enLocal;
 
   static String getFamily() => isEnglish() ? "SF-Pro" : "SF-Arabic";
 }

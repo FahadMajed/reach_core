@@ -30,6 +30,7 @@ class ReachScaffold extends StatelessWidget {
   final MainAxisAlignment mainAxisAlignment;
 
   ReachScaffold({
+    Key? key,
     this.title,
     this.customAppBar,
     this.imageFile = "",
@@ -53,7 +54,7 @@ class ReachScaffold extends StatelessWidget {
     this.withAppBar = true,
     this.withSafeArea = false,
     this.resizeToAvoidBottomInset = true,
-  });
+  }) : super(key: key);
 
   final bodyFocusNode = FocusNode();
 

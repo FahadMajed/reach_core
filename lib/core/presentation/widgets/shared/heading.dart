@@ -11,11 +11,12 @@ class Heading extends StatelessWidget {
   final bool hasDivider;
 
   const Heading({
+    Key? key,
     required this.h5,
     required this.h6,
     this.hasDivider = true,
     this.h4 = "",
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

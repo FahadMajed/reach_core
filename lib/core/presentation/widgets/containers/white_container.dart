@@ -11,11 +11,12 @@ class WhiteContainer extends StatelessWidget {
 
   const WhiteContainer({
     required this.body,
+    Key? key,
     this.onTap,
     this.outerPadding = padding8,
     this.innerPadding = padding8,
     this.alignment = CrossAxisAlignment.start,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => whiteContainer(context);
@@ -27,7 +28,8 @@ class WhiteContainer extends StatelessWidget {
         padding: outerPadding,
         child: Container(
           width: getDeviceWidth(context),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: radius),
+          decoration:
+              const BoxDecoration(color: Colors.white, borderRadius: radius),
           child: Padding(
             padding: innerPadding,
             child: Column(

@@ -25,11 +25,15 @@ class Validator {
     if (email.contains('@') && email.contains('.') == false) {
       return 'Invalid Email';
     }
-    if (email.contains('.')) if (email.split('.')[1].isEmpty) {
-      return 'Invalid Email';
+    if (email.contains('.')) {
+      if (email.split('.')[1].isEmpty) {
+        return 'Invalid Email';
+      }
     }
-    if (email.contains('.')) if (email.split('.')[0].endsWith('@')) {
-      return 'Invalid Email';
+    if (email.contains('.')) {
+      if (email.split('.')[0].endsWith('@')) {
+        return 'Invalid Email';
+      }
     }
     return stringValidator(email, "email".tr, 0, 100);
   }

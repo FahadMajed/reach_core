@@ -27,7 +27,7 @@ class PickerWithDesc extends StatelessWidget {
         IconWithText(
           icon: icon,
           text: desc,
-          style: IconLabelStyle.SmallBold,
+          style: IconLabelStyle.smallBold,
         ),
         sizedHeight4,
         PickerContainer(

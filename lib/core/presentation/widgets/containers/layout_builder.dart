@@ -4,8 +4,9 @@ class LayoutSingleChild extends StatelessWidget {
   final List<Widget> widgets;
 
   const LayoutSingleChild(
-    this.widgets,
-  );
+    this.widgets, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

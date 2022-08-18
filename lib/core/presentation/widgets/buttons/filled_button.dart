@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:reach_core/core/theme/theme.dart';
 // add icon?
 
-enum FilledButtonStyle { Primary, Accent }
+enum FilledButtonStyle { primary, accent }
 
 // ignore: must_be_immutable
 class FilledButton extends StatelessWidget {
@@ -11,7 +11,7 @@ class FilledButton extends StatelessWidget {
       {Key? key,
       required this.title,
       this.spinner,
-      this.style = FilledButtonStyle.Primary,
+      this.style = FilledButtonStyle.primary,
       required this.onPressed})
       : super(key: key) {
     spinner = spinner ?? RxBool(false);
@@ -25,7 +25,7 @@ class FilledButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
       () => Material(
-        color: style == FilledButtonStyle.Primary ? darkBlue : darkBlue100,
+        color: style == FilledButtonStyle.primary ? darkBlue : darkBlue100,
         borderRadius: radius,
         child: MaterialButton(
           onPressed: spinner!.value ? null : onPressed,
@@ -36,7 +36,7 @@ class FilledButton extends StatelessWidget {
                   color: Colors.white,
                 )
               : Text(title.tr,
-                  style: style == FilledButtonStyle.Primary
+                  style: style == FilledButtonStyle.primary
                       ? filledButtonPrimary
                       : filledButtonAccent),
         ),

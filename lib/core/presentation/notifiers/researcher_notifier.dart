@@ -1,74 +1,128 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reach_auth/providers/auth_providers.dart';
 import 'package:reach_core/core/core.dart';
 
-class ResearcherNotifier extends StateNotifier<Researcher> {
-  final Reader read;
+class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
   final String _userId;
-  late ResearcherRepository repository;
+  final ResearcherRepository _repository;
 
-  ResearcherNotifier(this.read, this._userId) : super(Researcher.empty()) {
-    read(isResearcherLoadingPvdr.notifier).state = true;
-    repository = read(researcherRepoPvdr);
-
-    if (_userId.isNotEmpty) getResearcher(_userId);
-  }
-
-  Future<void> getResearcher(String id) async {
-    final researcher = await repository.getDocument(id);
-    if (mounted) {
-      state = researcher;
-      read(isResearcherLoadingPvdr.notifier).state = false;
+  ResearcherNotifier(this._repository, this._userId)
+      : super(const AsyncLoading()) {
+    if (_userId.isNotEmpty) {
+      getResearcher(_userId);
     }
   }
 
-  Future<void> updateCurrentResearchs(String researchId) async {
-    final researcher = state;
+  Future<void> getResearcher(String id) async {
+    state = const AsyncLoading();
+    final researcher = await _repository.getDocument(id);
 
-    state = researcher..currentResearchsIds.remove(researchId);
-
-    await repository.updateDocument(researcher);
+    state = AsyncData(researcher);
   }
 
-  Future<void> createResearcher() async =>
-      await repository.createDocument(state).then((value) => state = value);
-
-  void updateState({
-    String? id,
-    String? name,
-    String? imageUrl,
-    String? bio,
-    String? organization,
-    String? city,
-  }) =>
-      state = state.copyWith(
-          researcherId: id,
-          city: city,
-          name: name,
-          imageUrl: imageUrl,
-          bio: bio,
-          organization: organization);
-
-  Future<void> updateData({
-    String? id,
-    String? name,
-    String? imageUrl,
-    String? bio,
-    String? organization,
-    String? city,
-    List? currentResearchsIds,
-    int? numberOfResearches,
+  Future<void> updateCurrentResearchs({
+    String? researchId,
+    Operation operation = Operation.add,
   }) async {
-    state = state.copyWith(
-        researcherId: id,
-        city: city,
-        name: name,
-        imageUrl: imageUrl,
-        bio: bio,
-        currentResearchsIds: currentResearchsIds,
-        numberOfResearches: numberOfResearches,
-        organization: organization);
-    await repository.updateDocument(state);
+    late final Researcher researcher;
+
+    switch (operation) {
+      case Operation.remove:
+        researcher = state.value!..currentResearchsIds.remove(researchId);
+        break;
+      case Operation.add:
+        researcher = state.value!..currentResearchsIds.add(researchId);
+        break;
+      case Operation.clear:
+        researcher = state.value!..currentResearchsIds.clear();
+        break;
+    }
+
+    _updateState(currentResearchsIds: researcher.currentResearchsIds);
+    await _updateData();
   }
+
+  Future<void> createResearcher(Researcher researcher) async =>
+      await _repository
+          .createDocument(researcher)
+          .then((r) => state = AsyncData(r));
+
+  void _updateState(
+          {String? id,
+          String? name,
+          String? imageUrl,
+          String? bio,
+          int? color,
+          String? organization,
+          String? city,
+          List? currentResearchsIds,
+          int? numberOfResearches}) =>
+      state.value != null
+          ? state = AsyncData(
+              state.value!.copyWith(
+                  researcherId: id,
+                  city: city,
+                  name: name,
+                  defaultColor: color,
+                  imageUrl: imageUrl,
+                  numberOfResearches: numberOfResearches,
+                  bio: bio,
+                  organization: organization),
+            )
+          : state = AsyncData(
+              Researcher(
+                researcherId: id!,
+                city: city!,
+                name: name!,
+                defaultColor: color!,
+                imageUrl: imageUrl!,
+                bio: bio!,
+                organization: organization!,
+                currentResearchsIds: [],
+                numberOfResearches: 0,
+              ),
+            );
+
+  Future<void> _updateData() async =>
+      await _repository.updateDocument(state.value!);
+
+  Future<void> updateProfile({
+    String? city,
+    String? bio,
+    String? org,
+    String? name,
+  }) async {
+    _updateState(
+      name: name,
+      bio: bio,
+      city: city,
+      organization: org,
+    );
+
+    await _updateData();
+  }
+
+  Future<void> updateImageUrl(String url) async {
+    _updateState(
+      imageUrl: url,
+    );
+    _updateData();
+  }
+
+  Future<void> endResearch(String researchId) async {
+    _incrementNumberOfResearchs();
+
+    await updateCurrentResearchs(
+        researchId: researchId, operation: Operation.remove);
+  }
+
+  void _incrementNumberOfResearchs() async => _updateState(
+        numberOfResearches: state.value!.numberOfResearches + 1,
+      );
 }
 
-final isResearcherLoadingPvdr = StateProvider((ref) => false);
+final researcherPvdr =
+    StateNotifierProvider<ResearcherNotifier, AsyncValue<Researcher>>((ref) {
+  final String userId = ref.watch(userPvdr).value?.uid ?? "";
+  final repo = ref.read(researcherRepoPvdr);
+  return ResearcherNotifier(repo, userId);
+});

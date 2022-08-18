@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:reach_core/core/core.dart';
 
 class Researcher {
@@ -81,7 +82,7 @@ class Researcher {
       name: name ?? this.name,
       researcherId: researcherId ?? this.researcherId,
       imageUrl: imageUrl ?? this.imageUrl,
-      defaultColor: this.defaultColor,
+      defaultColor: defaultColor ?? this.defaultColor,
       city: city ?? this.city,
       numberOfResearches: numberOfResearches ?? this.numberOfResearches,
       currentResearchsIds: currentResearchsIds ?? this.currentResearchsIds,
@@ -98,4 +99,38 @@ class Researcher {
       numberOfResearches: 0,
       organization: '',
       researcherId: '');
+
+  @override
+  String toString() {
+    return 'Researcher(name: $name, organization: $organization, bio: $bio, researcherId: $researcherId, imageUrl: $imageUrl, defaultColor: $defaultColor, city: $city, numberOfResearches: $numberOfResearches, currentResearchsIds: $currentResearchsIds)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Researcher &&
+        other.name == name &&
+        other.organization == organization &&
+        other.bio == bio &&
+        other.researcherId == researcherId &&
+        other.imageUrl == imageUrl &&
+        other.defaultColor == defaultColor &&
+        other.city == city &&
+        other.numberOfResearches == numberOfResearches &&
+        listEquals(other.currentResearchsIds, currentResearchsIds);
+  }
+
+  @override
+  int get hashCode {
+    return name.hashCode ^
+        organization.hashCode ^
+        bio.hashCode ^
+        researcherId.hashCode ^
+        imageUrl.hashCode ^
+        defaultColor.hashCode ^
+        city.hashCode ^
+        numberOfResearches.hashCode ^
+        currentResearchsIds.hashCode;
+  }
 }

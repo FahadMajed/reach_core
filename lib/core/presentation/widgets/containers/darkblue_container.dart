@@ -8,10 +8,13 @@ class DarkBlueContainer extends StatelessWidget {
 
   final CrossAxisAlignment crossAxisAlignment;
 
-  const DarkBlueContainer(this.widgets,
-      {this.innerPadding = 8,
-      this.outerPadding = EdgeInsets.zero,
-      this.crossAxisAlignment = CrossAxisAlignment.start});
+  const DarkBlueContainer(
+    this.widgets, {
+    Key? key,
+    this.innerPadding = 8,
+    this.outerPadding = EdgeInsets.zero,
+    this.crossAxisAlignment = CrossAxisAlignment.start,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,7 @@ class DarkBlueContainer extends StatelessWidget {
       padding: outerPadding,
       child: Container(
         width: getDeviceWidth(context),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: coolGrey50,
           borderRadius: radius,
         ),
@@ -39,8 +42,9 @@ class CenteredContainer extends StatelessWidget {
   final List<Widget> widgets;
 
   const CenteredContainer(
-    this.widgets,
-  );
+    this.widgets, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +53,12 @@ class CenteredContainer extends StatelessWidget {
       constraints: BoxConstraints(maxHeight: getDeviceHeight(context) * 0.2),
       decoration: BoxDecoration(
         color: Colors.grey[100],
-        borderRadius: BorderRadius.all(
+        borderRadius: const BorderRadius.all(
           Radius.circular(10),
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,

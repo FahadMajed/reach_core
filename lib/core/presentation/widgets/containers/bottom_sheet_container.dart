@@ -8,10 +8,12 @@ class BottomSheetContainer extends StatelessWidget {
   final double? height;
   final CrossAxisAlignment alignment;
   const BottomSheetContainer(
-      {required this.children,
+      {Key? key,
+      required this.children,
       this.alignment = CrossAxisAlignment.center,
       this.height,
-      this.showCross = true});
+      this.showCross = true})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,10 +54,12 @@ class BottomSheetScrollable extends StatelessWidget {
   final CrossAxisAlignment alignment;
 
   const BottomSheetScrollable(
-      {required this.children,
+      {Key? key,
+      required this.children,
       this.height,
       this.showCross = true,
-      this.alignment = CrossAxisAlignment.center});
+      this.alignment = CrossAxisAlignment.center})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(

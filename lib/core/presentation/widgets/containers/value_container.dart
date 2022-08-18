@@ -9,29 +9,36 @@ class ValueContainer extends StatelessWidget {
   late bool addSpacer;
   late IconData iconData;
 
-  ValueContainer({this.onPressed, required this.value, this.onLongPress}) {
+  ValueContainer(
+      {Key? key, this.onPressed, required this.value, this.onLongPress})
+      : super(key: key) {
     addSpacer = false;
   }
 
   ValueContainer.arrowRight(
-      {this.onPressed, required this.value, this.onLongPress}) {
+      {Key? key, this.onPressed, required this.value, this.onLongPress})
+      : super(key: key) {
     addSpacer = true;
     iconData = Icons.arrow_forward_ios;
   }
 
-  ValueContainer.edit({this.onPressed, required this.value, this.onLongPress}) {
+  ValueContainer.edit(
+      {Key? key, this.onPressed, required this.value, this.onLongPress})
+      : super(key: key) {
     addSpacer = true;
     iconData = Icons.edit;
   }
 
   ValueContainer.delete(
-      {this.onPressed, required this.value, this.onLongPress}) {
+      {Key? key, this.onPressed, required this.value, this.onLongPress})
+      : super(key: key) {
     addSpacer = true;
     iconData = Icons.highlight_off;
   }
 
   ValueContainer.arrowDown(
-      {this.onPressed, required this.value, this.onLongPress}) {
+      {Key? key, this.onPressed, required this.value, this.onLongPress})
+      : super(key: key) {
     addSpacer = false;
     iconData = Icons.arrow_drop_down;
   }
@@ -55,7 +62,7 @@ class ValueContainer extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (addSpacer) Spacer(),
+            if (addSpacer) const Spacer(),
             Icon(iconData),
             sizedWidth8
           ],

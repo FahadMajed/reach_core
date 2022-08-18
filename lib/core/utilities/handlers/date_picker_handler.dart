@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' as Flutter;
+import 'package:flutter/material.dart' as flutter;
 import 'package:get/route_manager.dart';
 import 'package:reach_core/core/core.dart';
 
@@ -28,7 +28,7 @@ class DatePickerHandler {
         ),
       );
     } else {
-      return Flutter.showDatePicker(
+      return flutter.showDatePicker(
           context: Get.overlayContext!,
           initialDate: initialDateTime ?? DateTime.now(),
           firstDate: initialDateTime ?? DateTime.now(),
