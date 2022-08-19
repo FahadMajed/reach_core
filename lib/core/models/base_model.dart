@@ -7,15 +7,18 @@ abstract class BaseModel<T> {
 
   @protected
   final UnmodifiableMapView<String, dynamic> data;
+  @protected
   BaseModel(Map<String, dynamic> jSON) : data = UnmodifiableMapView(jSON);
+  @protected
   Map<String, dynamic> toMap() => {...data};
 
-  @protected
-  dynamic get primaryField;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is BaseModel<T> && other.data == data;
+  }
 
   @override
-  bool operator ==(other) => other is T && other.hashCode == hashCode;
-
-  @override
-  int get hashCode => primaryField.hashCode;
+  int get hashCode => data.hashCode;
 }

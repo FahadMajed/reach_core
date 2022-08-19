@@ -8,15 +8,17 @@ class Participant extends BaseModel<Participant> {
 
   String get name => data['name'];
 
-  String get familyName => data['name'];
-
-  Map<String, Criterion> get criteria => data['criteria'];
+  Map<String, Criterion> get criteria => {
+        for (final String criterion in data['criteria']!.keys)
+          criterion: data['criteria'][criterion],
+      };
 
   String get imageUrl => data['imageUrl'];
 
-  List<Answer> get answers => data['answers'];
+  List<Answer> get answers =>
+      (data['answers'] as List).map((e) => Answer.fromMap(e)).toList();
 
-  List<String> get missingCriteria => data['missingCriteria'];
+  List get missingCriteria => data['missingCriteria'];
 
   int get defaultColor => data['defaultColor'];
 
@@ -37,7 +39,7 @@ class Participant extends BaseModel<Participant> {
   Participant copyWith(Map<String, dynamic> newData) => Participant(
         {
           ...data,
-          ...newData,
+          ...newData..removeWhere((key, value) => value == null),
         },
       );
 
@@ -49,8 +51,7 @@ class Participant extends BaseModel<Participant> {
         'defaultColor': 0xFFFFFF,
         'criteria': criteriaEmptyStateRanges,
         'imageUrl': "",
-        'familyName': "",
-        'enrolmentHistory': [],
+        'enrollmentHistory': [],
         'currentEnrollments': [],
         'name': "Participant",
         'walletBalance': 0,
@@ -58,7 +59,11 @@ class Participant extends BaseModel<Participant> {
       });
 
   @override
-  String get primaryField => participantId;
+  Map<String, dynamic> toMap() => {
+        ...data,
+        "criteria": criteria
+            .map((key, criterion) => MapEntry(key, criterionToMap(criterion)))
+      };
 
   @override
   String toString() => toMap().toString();

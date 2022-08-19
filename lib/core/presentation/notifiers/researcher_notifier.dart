@@ -1,9 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:reach_auth/providers/auth_providers.dart';
 import 'package:reach_core/core/core.dart';
 
 class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
   final String _userId;
   final ResearcherRepository _repository;
+
+  @protected
+  Researcher get researcher => state.value!;
 
   ResearcherNotifier(this._repository, this._userId)
       : super(const AsyncLoading()) {
@@ -14,7 +18,7 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
 
   Future<void> getResearcher(String id) async {
     state = const AsyncLoading();
-    final researcher = await _repository.getDocument(id);
+    final researcher = await _repository.get(id) ?? Researcher.empty();
 
     state = AsyncData(researcher);
   }
@@ -27,13 +31,13 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
 
     switch (operation) {
       case Operation.remove:
-        researcher = state.value!..currentResearchsIds.remove(researchId);
+        researcher = this.researcher..currentResearchsIds.remove(researchId);
         break;
       case Operation.add:
-        researcher = state.value!..currentResearchsIds.add(researchId);
+        researcher = this.researcher..currentResearchsIds.add(researchId);
         break;
       case Operation.clear:
-        researcher = state.value!..currentResearchsIds.clear();
+        researcher = this.researcher..currentResearchsIds.clear();
         break;
     }
 
@@ -43,8 +47,8 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
 
   Future<void> createResearcher(Researcher researcher) async =>
       await _repository
-          .createDocument(researcher)
-          .then((r) => state = AsyncData(r));
+          .create(researcher, researcher.researcherId)
+          .then((_) => state = AsyncData(researcher));
 
   void _updateState(
           {String? id,
@@ -56,34 +60,23 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
           String? city,
           List? currentResearchsIds,
           int? numberOfResearches}) =>
-      state.value != null
-          ? state = AsyncData(
-              state.value!.copyWith(
-                  researcherId: id,
-                  city: city,
-                  name: name,
-                  defaultColor: color,
-                  imageUrl: imageUrl,
-                  numberOfResearches: numberOfResearches,
-                  bio: bio,
-                  organization: organization),
-            )
-          : state = AsyncData(
-              Researcher(
-                researcherId: id!,
-                city: city!,
-                name: name!,
-                defaultColor: color!,
-                imageUrl: imageUrl!,
-                bio: bio!,
-                organization: organization!,
-                currentResearchsIds: [],
-                numberOfResearches: 0,
-              ),
-            );
+      state = AsyncData(
+        researcher.copyWith(
+          {
+            'researcherId': id,
+            'city': city,
+            'name': name,
+            'defaultColor': color,
+            'imageUrl': imageUrl,
+            'numberOfResearches': numberOfResearches,
+            'bio': bio,
+            'organization': organization
+          },
+        ),
+      );
 
   Future<void> _updateData() async =>
-      await _repository.updateDocument(state.value!);
+      await _repository.updateData(researcher, researcher.researcherId);
 
   Future<void> updateProfile({
     String? city,
@@ -116,7 +109,7 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
   }
 
   void _incrementNumberOfResearchs() async => _updateState(
-        numberOfResearches: state.value!.numberOfResearches + 1,
+        numberOfResearches: researcher.numberOfResearches + 1,
       );
 }
 

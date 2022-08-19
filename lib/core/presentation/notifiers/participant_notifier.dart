@@ -15,9 +15,11 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     }
   }
 
+  Participant get participant => state.value!;
+
   Future<void> getParticipant(String _uid) async {
     state = const AsyncLoading();
-    final participant = await _repository.getDocument(_uid);
+    final participant = await _repository.get(_uid) ?? Participant.empty();
 
     state = AsyncData(participant);
   }
@@ -37,7 +39,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
   }
 
   Future<void> _updateData() async =>
-      await _repository.updateDocument(state.value!);
+      await _repository.updateData(participant, participant.participantId);
 
   void _updateState({
     String? participantId,
@@ -48,50 +50,30 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     List? enrolmentHistory,
     List? currentEnrollments,
     int? walletBalance,
-    List<String>? missingCriteria,
+    List? missingCriteria,
   }) {
-    if (state.value == null) {
-      state = AsyncData(
-        Participant(
-          {
-            'participantId': participantId!,
-            'name': name!,
-            'missingCriteria': missingCriteria!,
-            'criteria': criteria!,
-            'imageUrl': imageUrl!,
-            'defaultColor': defaultColor!,
-            'enrolmentHistory': enrolmentHistory!,
-            'currentEnrollments': currentEnrollments!,
-            'walletBalance': walletBalance ?? 0
-          },
-        ),
-      );
-    } else {
-      state = AsyncData(
-        state.value!.copyWith(
-          {
-            'participantId': participantId,
-            'name': name,
-            'criteria': criteria,
-            'imageUrl': imageUrl,
-            'defaultColor': defaultColor,
-            'enrolmentHistory': enrolmentHistory,
-            'currentEnrollments': currentEnrollments,
-            'missingCriteria': missingCriteria,
-            'walletBalance': walletBalance
-          },
-        ),
-      );
-    }
+    state = AsyncData(
+      participant.copyWith(
+        {
+          'participantId': participantId,
+          'name': name,
+          'criteria': criteria,
+          'imageUrl': imageUrl,
+          'defaultColor': defaultColor,
+          'enrolmentHistory': enrolmentHistory,
+          'currentEnrollments': currentEnrollments,
+          'missingCriteria': missingCriteria,
+          'walletBalance': walletBalance
+        },
+      ),
+    );
   }
 
   Future<void> insertAnswers(
     bool insertAnswers,
     String researchId,
   ) async {
-    final participant = state.value!;
-
-    _repository.createSubDocument(
+    _repository.addListToSubdocument(
       participant.participantId,
       researchId,
       participant.answers,
@@ -100,12 +82,12 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
 
   Future<void> createParticipant(Participant participant) async =>
       await _repository
-          .createDocument(participant)
-          .then((p) => state = AsyncData(p!));
+          .create(participant, participant.participantId)
+          .then((_) => state = AsyncData(participant));
 
   void setMissingCriteria(Map<String, Criterion> researchCriteria) {
-    final _criteria = state.value!.criteria;
-    final missingCriteria = state.value!.missingCriteria;
+    final _criteria = participant.criteria;
+    final missingCriteria = participant.missingCriteria;
     missingCriteria.clear();
 
     for (String criterionName in researchCriteria.keys) {
@@ -128,8 +110,6 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     _updateState(missingCriteria: missingCriteria);
   }
 
-  void clearMissingCriteria() => state.value!.missingCriteria.clear();
-
   /// this method will not execute except participant might be logically eliglble,
   /// so if he is 22-25 and research is 26-30 the method does not have to verfiy that.
   /// check of one side fits, but the other is doubtful.
@@ -145,7 +125,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     String criterionName,
     RangeCriterion reserachCriterion,
   ) {
-    final _criteria = state.value!.criteria;
+    final _criteria = participant.criteria;
 
     final RangeCriterion myCriterion =
         _criteria[criterionName] as RangeCriterion;
@@ -183,7 +163,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     String criterionName,
     Criterion currentCriterion,
   ) async {
-    final Map<String, Criterion> _criteria = state.value!.criteria;
+    final Map<String, Criterion> _criteria = participant.criteria;
     if (currentCriterion is RangeCriterion) {
       _criteria.addAll(_compareBothSides(criterionName, currentCriterion));
     } else {
@@ -197,7 +177,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     String criterionName,
     RangeCriterion criterion,
   ) {
-    final _criteria = state.value!.criteria;
+    final _criteria = participant.criteria;
 
     var criterionTemp = _criteria[criterionName] as RangeCriterion;
 
@@ -217,7 +197,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
   }
 
   bool isMatched(Map<String, Criterion> researchCriteria) {
-    final _criteria = state.value!.criteria;
+    final _criteria = participant.criteria;
 
     bool isMatched = true;
 
@@ -248,28 +228,23 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
   }
 
   Future<void> addEnrolment(String researchId) async {
-    final participant = state.value!
-      ..currentEnrollments.add(researchId)
-      ..enrollmentHistory.add(researchId);
     _updateState(
-      currentEnrollments: participant.currentEnrollments,
-      enrolmentHistory: participant.enrollmentHistory,
+      currentEnrollments: participant.currentEnrollments..add(researchId),
+      enrolmentHistory: participant.enrollmentHistory..add(researchId),
     );
     await _updateData();
   }
 
   Future<void> removeEnrollment(String researchId) async {
-    final participant = state.value!..currentEnrollments.remove(researchId);
     _updateState(
-      currentEnrollments: participant.currentEnrollments,
+      currentEnrollments: participant.currentEnrollments..remove(researchId),
     );
     await _updateData();
   }
 
   Future<void> rejectEnrollment(String researchId) async {
-    final participant = state.value!..enrollmentHistory.remove(researchId);
     _updateState(
-      enrolmentHistory: participant.enrollmentHistory,
+      enrolmentHistory: participant.enrollmentHistory..remove(researchId),
     );
     await _updateData();
   }
