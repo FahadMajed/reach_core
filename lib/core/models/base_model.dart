@@ -9,7 +9,7 @@ abstract class BaseModel<T> {
   final UnmodifiableMapView<String, dynamic> data;
   @protected
   BaseModel(Map<String, dynamic> jSON) : data = UnmodifiableMapView(jSON);
-  @protected
+
   Map<String, dynamic> toMap() => {...data};
 
   @override

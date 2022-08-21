@@ -5,7 +5,7 @@ class ResearcherRepository extends BaseRepository<Researcher, void> {
 }
 
 final researcherRepoPvdr = Provider((ref) => ResearcherRepository(
-      remoteDataSource: FirestoreDataSource<Researcher, void>(
+      remoteDataSource: RemoteDatabase<Researcher, void>(
         db: ref.read(databaseProvider),
         collectionPath: "participants",
         fromMap: (snapshot, _) => snapshot.data() != null

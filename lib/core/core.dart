@@ -5,10 +5,11 @@ export 'package:font_awesome_flutter/font_awesome_flutter.dart';
 export 'package:sizer/sizer.dart';
 export 'package:url_launcher/url_launcher.dart';
 
+export 'controllers/controllers.dart';
 export 'data/data.dart';
 export 'l18n/l18n.dart';
 export 'models/models.dart';
-export 'presentation/presentation.dart';
 export 'providers/providers.dart';
 export 'theme/theme.dart';
+export 'ui/ui.dart';
 export 'utilities/utilities.dart';

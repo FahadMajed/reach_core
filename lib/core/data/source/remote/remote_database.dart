@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 ///T is the collection model, where E is the sub collection model
 
-class FirestoreDataSource<T, E> {
+class RemoteDatabase<T, E> {
   late final FirebaseFirestore _db;
 
   late final CollectionReference<T> _collection;
@@ -19,7 +19,7 @@ class FirestoreDataSource<T, E> {
 
   late final Map<String, Object?> Function(E, SetOptions?)? _subToMap;
 
-  FirestoreDataSource({
+  RemoteDatabase({
     required FirebaseFirestore db,
     required String collectionPath,
     required T Function(DocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -42,6 +42,25 @@ class FirestoreDataSource<T, E> {
         .collection(collectionPath)
         .withConverter<T>(fromFirestore: _fromMap, toFirestore: toMap);
   }
+
+  CollectionReference<E> getSubCollection(String parentId) => _db
+      .collection(_collection.id)
+      .doc(parentId)
+      .collection(_subCollectionPath!)
+      .withConverter<E>(fromFirestore: _subFromMap!, toFirestore: _subToMap!);
+
+  Query<T> Function(Object,
+      {Object? arrayContains,
+      List<Object?>? arrayContainsAny,
+      Object? isEqualTo,
+      Object? isGreaterThan,
+      Object? isGreaterThanOrEqualTo,
+      Object? isLessThan,
+      Object? isLessThanOrEqualTo,
+      Object? isNotEqualTo,
+      bool? isNull,
+      List<Object?>? whereIn,
+      List<Object?>? whereNotIn}) get where => _collection.where;
 
   Future<void> createDocument(T object, String id) async =>
       await _collection.doc(id).set(object);
@@ -96,42 +115,13 @@ class FirestoreDataSource<T, E> {
           .then((query) => query.docs.map((doc) => doc.data()).toList());
 
   ///returns list of documents where [field] is equals to [value]
-  Future<List<T?>> getDocumentsEqualsTo(String field, String value) async =>
-      await _collection
-          .where(field, isEqualTo: value)
-          .get()
-          .then((query) => query.docs.map((e) => e.data()).toList());
-
-  Future<List<T?>> getDocumentsWhereIn(String field, List list) async =>
-      await _collection
-          .where(field, whereIn: list)
-          .get()
-          .then((query) => query.docs.map((e) => e.data()).toList());
-
-  Future<List<T?>> getDocumentsWhereEqualsAndIn({
-    required String fieldEquals,
-    required dynamic clause,
-    required String fieldIn,
-    required List list,
-  }) =>
-      _collection
-          .where(fieldEquals, isEqualTo: clause)
-          .where(fieldIn, whereIn: list)
-          .get()
-          .then((value) => value.docs.map((doc) => doc.data()).toList());
 
   Future<void> createSubdocument({
-    required String id,
+    required String parentId,
     required String subDocId,
     required E data,
   }) async =>
-      await _collection
-          .doc(id)
-          .collection(_subCollectionPath!)
-          .withConverter<E>(
-              fromFirestore: _subFromMap!, toFirestore: _subToMap!)
-          .doc(subDocId)
-          .set(data);
+      await getSubCollection(parentId).doc(subDocId).set(data);
 
   Future<void> addListToSubdocument({
     required String id,
@@ -151,16 +141,19 @@ class FirestoreDataSource<T, E> {
   Stream<T?> streamDocument(String id) =>
       _collection.doc(id).snapshots().map((event) => event.data());
 
-  Stream<List<T?>> streamDocumentsEqualsTo(String field, String value) =>
-      _collection
-          .where(field, isEqualTo: value)
-          .snapshots()
-          .map((event) => event.docs.map((e) => e.data()).toList());
+  Future<List<T>> getQuery(Query<T> query) async => await query
+      .get()
+      .then((value) => value.docs.map((e) => e.data()).toList());
 
-  Stream<List<E>> streamSubcollection(String docId) => _collection
-      .doc(docId)
-      .collection(_subCollectionPath!)
-      .withConverter<E>(fromFirestore: _subFromMap!, toFirestore: _subToMap!)
+  Future<List<E>> getQuerySubcollection(Query<E> query) async => await query
+      .get()
+      .then((value) => value.docs.map((e) => e.data()).toList());
+
+  Stream<List<T>> streamQuery(Query<T> query) => query
       .snapshots()
-      .map((event) => event.docs.map((e) => e.data()).toList());
+      .map((value) => value.docs.map((e) => e.data()).toList());
+
+  Stream<List<E>> streamSubcollectionQuery(Query<E> query) => query
+      .snapshots()
+      .map((value) => value.docs.map((e) => e.data()).toList());
 }

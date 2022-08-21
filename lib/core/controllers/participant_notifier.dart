@@ -73,7 +73,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     bool insertAnswers,
     String researchId,
   ) async {
-    _repository.addListToSubdocument(
+    _repository.addAnswers(
       participant.participantId,
       researchId,
       participant.answers,

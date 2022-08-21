@@ -1,16 +1,29 @@
 import 'package:reach_core/core/core.dart';
 import 'package:reach_research/research.dart';
 
+abstract class IParticipantRepository {
+  //CRUD +
+  Future<void> removeCurrentEnrollment(String id, String researchId);
+  Future<void> addAnswers(String id, String answersId, List<Answer> asnwers);
+}
+
 class ParticipantsRepository extends BaseRepository<Participant, Answer>
-    with
-        FetchAllMixin<Participant, Answer>,
-        SubcollectionMixin<Participant, Answer> {
+    implements IParticipantRepository {
   ParticipantsRepository({required super.remoteDataSource});
+
+  @override
+  Future<void> removeCurrentEnrollment(String id, String researchId) async =>
+      await updateFieldArrayRemove(id, 'currentEnrollments', [researchId]);
+
+  @override
+  Future<void> addAnswers(
+          String id, String answersId, List<Answer> asnwers) async =>
+      await addListToSubdocument(id, answersId, asnwers);
 }
 
 final partsRepoPvdr = Provider(
   (ref) => ParticipantsRepository(
-    remoteDataSource: FirestoreDataSource<Participant, Answer>(
+    remoteDataSource: RemoteDatabase<Participant, Answer>(
       db: ref.read(databaseProvider),
       collectionPath: "participants",
       fromMap: (snapshot, _) => snapshot.data() != null
