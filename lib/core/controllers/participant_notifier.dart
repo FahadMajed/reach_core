@@ -16,6 +16,10 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
   }
 
   Participant get participant => state.value!;
+  List get enrollmentHistory => participant.enrollmentHistory;
+  List get currentEnrollments => participant.currentEnrollments;
+  Map<String, Criterion> get criteria => participant.criteria!;
+  List get missingCriteria => participant.missingCriteria;
 
   Future<void> getParticipant(String _uid) async {
     state = const AsyncLoading();
@@ -57,7 +61,14 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
         {
           'participantId': participantId,
           'name': name,
-          'criteria': criteria,
+          'criteria': criteria?.map(
+            (key, criterion) => MapEntry(
+              key,
+              criterionToMap(
+                criterion,
+              ),
+            ),
+          ),
           'imageUrl': imageUrl,
           'defaultColor': defaultColor,
           'enrolmentHistory': enrolmentHistory,
@@ -86,9 +97,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
           .then((_) => state = AsyncData(participant));
 
   void setMissingCriteria(Map<String, Criterion> researchCriteria) {
-    final _criteria = participant.criteria;
-    final missingCriteria = participant.missingCriteria;
-    missingCriteria.clear();
+    _updateState(missingCriteria: []);
 
     for (String criterionName in researchCriteria.keys) {
       if (researchCriteria[criterionName] is RangeCriterion) {
@@ -100,7 +109,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
         if (partiallyTrue != null) {
           missingCriteria.add(criterionName);
         }
-      } else if ((_criteria[criterionName] as ValueCriterion)
+      } else if ((criteria[criterionName] as ValueCriterion)
           .condition
           .isEmpty) {
         missingCriteria.add(criterionName);
@@ -128,7 +137,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     final _criteria = participant.criteria;
 
     final RangeCriterion myCriterion =
-        _criteria[criterionName] as RangeCriterion;
+        _criteria![criterionName] as RangeCriterion;
 
     int myFrom = myCriterion.from;
     int myTo = myCriterion.to;
@@ -163,7 +172,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     String criterionName,
     Criterion currentCriterion,
   ) async {
-    final Map<String, Criterion> _criteria = participant.criteria;
+    final Map<String, Criterion> _criteria = participant.criteria!;
     if (currentCriterion is RangeCriterion) {
       _criteria.addAll(_compareBothSides(criterionName, currentCriterion));
     } else {
@@ -179,7 +188,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
   ) {
     final _criteria = participant.criteria;
 
-    var criterionTemp = _criteria[criterionName] as RangeCriterion;
+    var criterionTemp = _criteria![criterionName] as RangeCriterion;
 
     int myFrom = criterionTemp.from;
     int myTo = criterionTemp.to;
@@ -204,7 +213,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     for (final researchCriterion in researchCriteria.values) {
       if (researchCriterion is ValueCriterion) {
         ValueCriterion myCriterion =
-            _criteria[researchCriterion.name] as ValueCriterion;
+            _criteria![researchCriterion.name] as ValueCriterion;
 
         if (myCriterion.condition != researchCriterion.condition &&
             myCriterion.condition.isNotEmpty) {
@@ -213,7 +222,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
         }
       } else if (researchCriterion is RangeCriterion) {
         RangeCriterion myCriterion =
-            _criteria[researchCriterion.name] as RangeCriterion;
+            _criteria![researchCriterion.name] as RangeCriterion;
 
         if (myCriterion.from > researchCriterion.to) {
           isMatched = false;
@@ -229,22 +238,22 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
 
   Future<void> addEnrolment(String researchId) async {
     _updateState(
-      currentEnrollments: participant.currentEnrollments..add(researchId),
-      enrolmentHistory: participant.enrollmentHistory..add(researchId),
+      currentEnrollments: [...currentEnrollments, researchId],
+      enrolmentHistory: [...enrollmentHistory, researchId],
     );
     await _updateData();
   }
 
   Future<void> removeEnrollment(String researchId) async {
     _updateState(
-      currentEnrollments: participant.currentEnrollments..remove(researchId),
+      currentEnrollments: currentEnrollments..remove(researchId),
     );
     await _updateData();
   }
 
   Future<void> rejectEnrollment(String researchId) async {
     _updateState(
-      enrolmentHistory: participant.enrollmentHistory..remove(researchId),
+      enrolmentHistory: enrollmentHistory..remove(researchId),
     );
     await _updateData();
   }

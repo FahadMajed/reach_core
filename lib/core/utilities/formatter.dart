@@ -12,7 +12,7 @@ class Formatter {
       researcherId + Timestamp.now().millisecondsSinceEpoch.toString();
 
   static String formatGroupId({required String title, required int number}) =>
-      "Group 1 - $title - ${formatTimeId()}";
+      "Group $number - $title - ${formatTimeId()}";
 
   static String? parseDateNoTime(String? dateTime) {
     if (dateTime == null) {

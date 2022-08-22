@@ -8,9 +8,9 @@ class Participant extends BaseModel<Participant> {
 
   String get name => data['name'];
 
-  Map<String, Criterion> get criteria => {
-        for (final String criterion in data['criteria']!.keys)
-          criterion: data['criteria'][criterion],
+  Map<String, Criterion>? get criteria => {
+        for (final String criterion in data['criteria']?.keys ?? {})
+          criterion: criterionFromMap(data['criteria'][criterion]),
       };
 
   String get imageUrl => data['imageUrl'];
@@ -49,22 +49,31 @@ class Participant extends BaseModel<Participant> {
   factory Participant.empty() => Participant({
         'participantId': '',
         'defaultColor': 0xFFFFFF,
-        'criteria': criteriaEmptyStateRanges,
+        'criteria': criteriaEmptyStateRanges.map(
+          (key, criterion) => MapEntry(
+            key,
+            criterionToMap(
+              criterion,
+            ),
+          ),
+        ),
         'imageUrl': "",
-        'enrollmentHistory': [],
-        'currentEnrollments': [],
+        'enrollmentHistory': const [],
+        'currentEnrollments': const [],
         'name': "Participant",
         'walletBalance': 0,
-        'missingCriteria': []
+        'missingCriteria': const []
       });
 
   @override
   Map<String, dynamic> toMap() => {
         ...data,
-        "criteria": criteria
+        "criteria": criteria!
             .map((key, criterion) => MapEntry(key, criterionToMap(criterion)))
       };
 
   @override
-  String toString() => toMap().toString();
+  List<Object> get props => [toMap()];
+
+  Participant get partial => Participant(toPartialMap());
 }

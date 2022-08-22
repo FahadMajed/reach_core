@@ -19,39 +19,39 @@ import 'package:reach_core/core/data/source/source.dart';
 ///according to the entity contract
 abstract class BaseRepository<T, E> {
   @protected
-  late final RemoteDatabase<T, E> _firestore;
+  late final RemoteDatabase<T, E> _db;
 
   @protected
-  RemoteDatabase<T, E> get remoteDataSource => _firestore;
+  RemoteDatabase<T, E> get remoteDatabase => _db;
 
   BaseRepository({
-    required RemoteDatabase<T, E> remoteDataSource,
+    required RemoteDatabase<T, E> remoteDatabase,
   }) {
-    _firestore = remoteDataSource;
+    _db = remoteDatabase;
   }
 
   ///persists [object]
 
   Future<void> create(T object, String id) async =>
-      await _firestore.createDocument(object, id);
+      await _db.createDocument(object, id);
 
   ///updates [T] field
 
   Future<void> updateField(String id, String field, dynamic newData) async =>
-      await _firestore.updateField(id, field, newData);
+      await _db.updateField(id, field, newData);
 
   ///updates [T]
 
   Future<void> updateData(T object, String id) async =>
-      await _firestore.updateDocument(object, id);
+      await _db.updateDocument(object, id);
 
   ///fetches [T] using [T].id
 
-  Future<T?> get(String id) async => await _firestore.getDocument(id);
+  Future<T?> get(String id) async => await _db.getDocument(id);
 
   ///deletes [T]
 
-  Future<void> delete(String id) async => await _firestore.deleteDocument(id);
+  Future<void> delete(String id) async => await _db.deleteDocument(id);
 
   ///used for updating an array in the source, by adding [union] to
   ///[T] [field]
@@ -61,7 +61,7 @@ abstract class BaseRepository<T, E> {
     String field,
     List union,
   ) async =>
-      await _firestore.updateFieldArrayUnion(docId, field, union);
+      await _db.updateFieldArrayUnion(docId, field, union);
 
   ///used for updating an array in the source, by removing [remove] from
   ///[T] [field]
@@ -71,22 +71,21 @@ abstract class BaseRepository<T, E> {
     String field,
     List remove,
   ) async =>
-      await _firestore.updateFieldArrayRemove(docId, field, remove);
+      await _db.updateFieldArrayRemove(docId, field, remove);
 
   @protected
-  Future<List<T>> getQuery(Query<T> query) async =>
-      await _firestore.getQuery(query);
+  Future<List<T>> getQuery(Query<T> query) async => await _db.getQuery(query);
 
   @protected
-  Stream<List<T>> streamQuery(Query<T> query) => _firestore.streamQuery(query);
+  Stream<List<T>> streamQuery(Query<T> query) => _db.streamQuery(query);
 
   @protected
   Stream<List<E>> streamSubcollectionQuery(Query<E> query) =>
-      _firestore.streamSubcollectionQuery(query);
+      _db.streamSubcollectionQuery(query);
 
   @protected
   Future<List<E>> getQuerySubcollection(Query<E> query) async =>
-      await _firestore.getQuerySubcollection(query);
+      await _db.getQuerySubcollection(query);
 
   @protected
   Future<void> createSubdocument(
@@ -94,7 +93,7 @@ abstract class BaseRepository<T, E> {
     String subDocId,
     E data,
   ) async =>
-      await remoteDataSource.createSubdocument(
+      await remoteDatabase.createSubdocument(
         parentId: id,
         subDocId: subDocId,
         data: data,
@@ -106,7 +105,7 @@ abstract class BaseRepository<T, E> {
     String subDocId,
     List<E> data,
   ) async =>
-      await remoteDataSource.addListToSubdocument(
+      await remoteDatabase.addListToSubdocument(
         id: id,
         subDocId: subDocId,
         data: data,

@@ -9,7 +9,7 @@ abstract class IParticipantRepository {
 
 class ParticipantsRepository extends BaseRepository<Participant, Answer>
     implements IParticipantRepository {
-  ParticipantsRepository({required super.remoteDataSource});
+  ParticipantsRepository({required super.remoteDatabase});
 
   @override
   Future<void> removeCurrentEnrollment(String id, String researchId) async =>
@@ -23,7 +23,7 @@ class ParticipantsRepository extends BaseRepository<Participant, Answer>
 
 final partsRepoPvdr = Provider(
   (ref) => ParticipantsRepository(
-    remoteDataSource: RemoteDatabase<Participant, Answer>(
+    remoteDatabase: RemoteDatabase<Participant, Answer>(
       db: ref.read(databaseProvider),
       collectionPath: "participants",
       fromMap: (snapshot, _) => snapshot.data() != null

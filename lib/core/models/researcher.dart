@@ -32,7 +32,7 @@ class Researcher extends BaseModel<Researcher> {
         'name': '',
         'bio': '',
         'city': '',
-        'currentResearchsIds': [],
+        'currentResearchsIds': const [],
         'defaultColor': ColorGenerator.getRandomColor().value,
         'imageUrl': '',
         'numberOfResearches': 0,
@@ -41,5 +41,5 @@ class Researcher extends BaseModel<Researcher> {
       });
 
   @override
-  String toString() => toMap().toString();
+  List<Object> get props => [toMap()];
 }
