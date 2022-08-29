@@ -24,7 +24,7 @@ class ParticipantsRepository extends BaseRepository<Participant, Answer>
 final partsRepoPvdr = Provider(
   (ref) => ParticipantsRepository(
     remoteDatabase: RemoteDatabase<Participant, Answer>(
-      db: ref.read(databaseProvider),
+      db: ref.read(databasePvdr),
       collectionPath: "participants",
       fromMap: (snapshot, _) => snapshot.data() != null
           ? Participant(snapshot.data()!)

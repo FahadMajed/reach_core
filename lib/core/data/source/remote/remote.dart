@@ -1,3 +1,3 @@
-export 'push_notifications.dart';
+export 'notifications.dart';
 export 'remote_database.dart';
 export 'api.dart';

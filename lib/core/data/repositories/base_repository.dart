@@ -98,7 +98,15 @@ abstract class BaseRepository<T, E> {
         subDocId: subDocId,
         data: data,
       );
-
+  @protected
+  Future<String> createSubdocumentNoId(
+    String id,
+    E data,
+  ) async =>
+      await remoteDatabase.createSubdocumentNoId(
+        parentId: id,
+        data: data,
+      );
   @protected
   Future<void> addListToSubdocument(
     String id,

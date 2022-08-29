@@ -22,10 +22,10 @@ class RemoteDatabase<T, E> {
   RemoteDatabase({
     required FirebaseFirestore db,
     required String collectionPath,
-    required T Function(DocumentSnapshot<Map<String, dynamic>> snapshot,
-            SnapshotOptions? options)
+    required T Function(
+            DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? _)
         fromMap,
-    required Map<String, Object?> Function(T, SetOptions?) toMap,
+    required Map<String, Object?> Function(T object, SetOptions? _) toMap,
     String subCollectionPath = "",
     E Function(DocumentSnapshot<Map<String, dynamic>> snapshot,
             SnapshotOptions? options)?
@@ -122,6 +122,20 @@ class RemoteDatabase<T, E> {
     required E data,
   }) async =>
       await getSubCollection(parentId).doc(subDocId).set(data);
+
+  ///GENERATES ID FOR DOC
+  Future<String> createSubdocumentNoId({
+    required String parentId,
+    required E data,
+  }) async =>
+      await getSubCollection(parentId).add(data).then((doc) => doc.id);
+
+  Future<void> updateSubdoc(
+          String parentId, String subDocId, Map<String, Object?> data) async =>
+      await getSubCollection(parentId).doc(subDocId).update(data);
+
+  Future<void> deleteSubdoc(String parentId, String subDocId) async =>
+      await getSubCollection(parentId).doc(subDocId).delete();
 
   Future<void> addListToSubdocument({
     required String id,
