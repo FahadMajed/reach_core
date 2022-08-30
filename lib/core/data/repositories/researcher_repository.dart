@@ -1,8 +1,10 @@
 import 'package:reach_core/core/core.dart';
 
-class ResearcherRepository extends BaseRepository<Researcher, void> {
+class ResearcherRepository extends BaseRepository<Researcher, void>
+    implements BaseResearcher {
   ResearcherRepository({required super.remoteDatabase});
 
+  @override
   Future<void> addResearch(String researcherId, String researchId) async =>
       await updateFieldArrayUnion(
         researcherId,
@@ -10,6 +12,7 @@ class ResearcherRepository extends BaseRepository<Researcher, void> {
         [researchId],
       );
 
+  @override
   Future<void> endResearch(String researcherId, String researchId) async {
     await updateFieldArrayRemove(
       researcherId,

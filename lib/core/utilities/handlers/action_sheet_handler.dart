@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../core.dart';
 
 class ActionSheetHandler {
-  static Future showActionSheet(
+  static Future<void> showActionSheet(
       {required Map<String, void Function()> actions,
       String destructiveAction = ""}) {
     return showCupertinoModalPopup<void>(

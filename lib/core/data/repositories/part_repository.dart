@@ -1,19 +1,17 @@
 import 'package:reach_core/core/core.dart';
 import 'package:reach_research/research.dart';
 
-abstract class IParticipantRepository {
-  //CRUD +
-  Future<void> removeCurrentEnrollment(String id, String researchId);
-  Future<void> addAnswers(String id, String answersId, List<Answer> asnwers);
-}
-
 class ParticipantsRepository extends BaseRepository<Participant, Answer>
-    implements IParticipantRepository {
+    implements BaseParticipant {
   ParticipantsRepository({required super.remoteDatabase});
 
   @override
-  Future<void> removeCurrentEnrollment(String id, String researchId) async =>
+  Future<void> removeEnrollment(String id, String researchId) async =>
       await updateFieldArrayRemove(id, 'currentEnrollments', [researchId]);
+
+  @override
+  Future<void> addEnrollment(String id, String researchId) async =>
+      await updateFieldArrayUnion(id, 'currentEnrollments', [researchId]);
 
   @override
   Future<void> addAnswers(

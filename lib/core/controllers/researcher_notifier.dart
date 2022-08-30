@@ -13,6 +13,7 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
     required CreateResearcher createResearcher,
     required UpdateResearcher updateResearcher,
   }) : super(const AsyncLoading()) {
+    _uid = uid;
     _getResearcher = getResearcher;
     _createResearcher = createResearcher;
     _updateResearcher = updateResearcher;

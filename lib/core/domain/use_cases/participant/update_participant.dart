@@ -19,23 +19,22 @@ class UpdateParticipant extends UseCase<Participant, UpdateParticipantParams> {
   @override
   Future<Participant> call(UpdateParticipantParams params) async {
     final updatedParticipant = params.updatedParticipant;
-    final updatedParticipantPartial = updatedParticipant.partial;
 
     for (final researchId in params.researchsIds ?? []) {
       await groupsRepository.updateParticipant(
         researchId,
-        updatedParticipantPartial,
+        updatedParticipant,
       );
       await enrollmentsRepository.updateParticipant(
         researchId,
-        updatedParticipantPartial,
+        updatedParticipant,
       );
     }
 
     for (final chatId in params.chatsIds ?? []) {
       await chatsRepository.updateParticipant(
         chatId,
-        updatedParticipantPartial,
+        updatedParticipant,
       );
     }
 

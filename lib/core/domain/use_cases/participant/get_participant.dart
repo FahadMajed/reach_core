@@ -8,7 +8,7 @@ class GetParticipant extends UseCase<Participant, GetParticipantParams> {
   Future<Participant> call(GetParticipantParams params) async =>
       await repository
           .get(params.participantId)
-          .then((participant) => participant!);
+          .then((participant) => participant ?? Participant.empty());
 }
 
 class GetParticipantParams {

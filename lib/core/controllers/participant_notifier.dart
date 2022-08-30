@@ -43,7 +43,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
         )
         .then(
           (participant) => state = AsyncData(participant),
-          onError: (e) => state = AsyncError(e),
+          // onError: (e) => state = AsyncError(e),
         );
   }
 

@@ -24,6 +24,20 @@ abstract class BaseRepository<T, E> {
   @protected
   RemoteDatabase<T, E> get remoteDatabase => _db;
 
+  @protected
+  Query<T> Function(Object,
+      {Object? arrayContains,
+      List<Object?>? arrayContainsAny,
+      Object? isEqualTo,
+      Object? isGreaterThan,
+      Object? isGreaterThanOrEqualTo,
+      Object? isLessThan,
+      Object? isLessThanOrEqualTo,
+      Object? isNotEqualTo,
+      bool? isNull,
+      List<Object?>? whereIn,
+      List<Object?>? whereNotIn}) get where => remoteDatabase.where;
+
   BaseRepository({
     required RemoteDatabase<T, E> remoteDatabase,
   }) {
