@@ -1,5 +1,6 @@
-import 'package:reach_core/core/models/base_model.dart';
 import 'package:reach_research/research.dart';
+
+import 'base_model.dart';
 
 class Participant extends BaseModel<Participant> {
   Participant(Map<String, dynamic> jSON) : super(jSON);
@@ -75,5 +76,6 @@ class Participant extends BaseModel<Participant> {
   @override
   List<Object> get props => [toMap()];
 
+  ///returns sub-set of participants data, used for duplications
   Participant get partial => Participant(toPartialMap());
 }

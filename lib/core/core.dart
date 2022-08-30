@@ -8,8 +8,8 @@ export 'package:url_launcher/url_launcher.dart';
 
 export 'controllers/controllers.dart';
 export 'data/data.dart';
+export 'domain/domain.dart';
 export 'l18n/l18n.dart';
-export 'models/models.dart';
 export 'providers/providers.dart';
 export 'theme/theme.dart';
 export 'ui/ui.dart';

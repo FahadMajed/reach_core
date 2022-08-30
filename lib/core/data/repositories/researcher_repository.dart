@@ -10,12 +10,18 @@ class ResearcherRepository extends BaseRepository<Researcher, void> {
         [researchId],
       );
 
-  Future<void> removeResearch(String researcherId, String researchId) async =>
-      await updateFieldArrayRemove(
-        researcherId,
-        'currentEnrollments',
-        [researchId],
-      );
+  Future<void> endResearch(String researcherId, String researchId) async {
+    await updateFieldArrayRemove(
+      researcherId,
+      'currentEnrollments',
+      [researchId],
+    );
+
+    await remoteDatabase.incrementField(
+      researcherId,
+      'numberOfResearches',
+    );
+  }
 }
 
 final researcherRepoPvdr = Provider(

@@ -42,4 +42,6 @@ class Researcher extends BaseModel<Researcher> {
 
   @override
   List<Object> get props => [toMap()];
+
+  Researcher get partial => Researcher(toPartialMap());
 }

@@ -170,4 +170,8 @@ class RemoteDatabase<T, E> {
   Stream<List<E>> streamSubcollectionQuery(Query<E> query) => query
       .snapshots()
       .map((value) => value.docs.map((e) => e.data()).toList());
+
+  Future<void> incrementField(String docId, String field) async {
+    await _collection.doc(docId).update({field: FieldValue.increment(1)});
+  }
 }

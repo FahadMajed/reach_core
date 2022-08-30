@@ -1,56 +1,80 @@
 import 'package:flutter/material.dart';
-import 'package:reach_auth/providers/auth_providers.dart';
 import 'package:reach_core/core/core.dart';
 
 class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
-  final String _userId;
-  final ResearcherRepository _repository;
+  late final String _uid;
+  late final GetResearcher _getResearcher;
+  late final CreateResearcher _createResearcher;
+  late final UpdateResearcher _updateResearcher;
+
+  ResearcherNotifier({
+    required String uid,
+    required GetResearcher getResearcher,
+    required CreateResearcher createResearcher,
+    required UpdateResearcher updateResearcher,
+  }) : super(const AsyncLoading()) {
+    _getResearcher = getResearcher;
+    _createResearcher = createResearcher;
+    _updateResearcher = updateResearcher;
+
+    if (_uid.isNotEmpty) {
+      this.getResearcher(_uid);
+    }
+  }
 
   @protected
   Researcher get researcher => state.value!;
 
-  ResearcherNotifier(this._repository, this._userId)
-      : super(const AsyncLoading()) {
-    if (_userId.isNotEmpty) {
-      getResearcher(_userId);
-    }
-  }
-
   Future<void> getResearcher(String id) async {
     state = const AsyncLoading();
-    final researcher = await _repository.get(id) ?? Researcher.empty();
-
-    state = AsyncData(researcher);
-  }
-
-  Future<void> updateCurrentResearchs({
-    String? researchId,
-    Operation operation = Operation.add,
-  }) async {
-    late final Researcher researcher;
-
-    switch (operation) {
-      case Operation.remove:
-        researcher = this.researcher..currentResearchsIds.remove(researchId);
-        break;
-      case Operation.add:
-        researcher = this.researcher..currentResearchsIds.add(researchId);
-        break;
-      case Operation.clear:
-        researcher = this.researcher..currentResearchsIds.clear();
-        break;
-    }
-
-    _updateState(currentResearchsIds: researcher.currentResearchsIds);
-    await _updateData();
+    await _getResearcher
+        .call(
+          GetResearcherParams(researcherId: id),
+        )
+        .then(
+          (researcher) => state = AsyncData(researcher),
+          onError: (e) => state = AsyncError(e),
+        );
   }
 
   Future<void> createResearcher(Researcher researcher) async =>
-      await _repository
-          .create(researcher, researcher.researcherId)
-          .then((_) => state = AsyncData(researcher));
+      await _createResearcher
+          .call(
+            CreateResearcherParams(researcher: researcher),
+          )
+          .then(
+            (researcher) => state = AsyncData(researcher),
+            onError: (e) => state = AsyncError(e),
+          );
 
-  void _updateState(
+  Future<void> updateProfile({
+    String? city,
+    String? bio,
+    String? org,
+    String? name,
+    String? imageUrl,
+    List? chatsIds,
+    List? researchsIds,
+  }) async =>
+      await _updateResearcher
+          .call(
+            UpdateResearcherParams(
+              updatedResearcher: _copyStateWith(
+                bio: bio,
+                name: name,
+                organization: org,
+                imageUrl: imageUrl,
+              ),
+              chatsIds: chatsIds,
+              researchsIds: researchsIds,
+            ),
+          )
+          .then(
+            (researcher) => state = AsyncData(researcher),
+            onError: (e) => state = AsyncError(e),
+          );
+
+  Researcher _copyStateWith(
           {String? id,
           String? name,
           String? imageUrl,
@@ -60,62 +84,17 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
           String? city,
           List? currentResearchsIds,
           int? numberOfResearches}) =>
-      state = AsyncData(
-        researcher.copyWith(
-          {
-            'researcherId': id,
-            'city': city,
-            'name': name,
-            'defaultColor': color,
-            'imageUrl': imageUrl,
-            'numberOfResearches': numberOfResearches,
-            'bio': bio,
-            'organization': organization
-          },
-        ),
-      );
-
-  Future<void> _updateData() async =>
-      await _repository.updateData(researcher, researcher.researcherId);
-
-  Future<void> updateProfile({
-    String? city,
-    String? bio,
-    String? org,
-    String? name,
-  }) async {
-    _updateState(
-      name: name,
-      bio: bio,
-      city: city,
-      organization: org,
-    );
-
-    await _updateData();
-  }
-
-  Future<void> updateImageUrl(String url) async {
-    _updateState(
-      imageUrl: url,
-    );
-    _updateData();
-  }
-
-  Future<void> endResearch(String researchId) async {
-    _incrementNumberOfResearchs();
-
-    await updateCurrentResearchs(
-        researchId: researchId, operation: Operation.remove);
-  }
-
-  void _incrementNumberOfResearchs() async => _updateState(
-        numberOfResearches: researcher.numberOfResearches + 1,
+      researcher.copyWith(
+        {
+          'researcherId': id,
+          'city': city,
+          'name': name,
+          'defaultColor': color,
+          'imageUrl': imageUrl,
+          'numberOfResearches': numberOfResearches,
+          'bio': bio,
+          'organization': organization,
+          'currentResearchsIds': currentResearchsIds,
+        },
       );
 }
-
-final researcherPvdr =
-    StateNotifierProvider<ResearcherNotifier, AsyncValue<Researcher>>((ref) {
-  final String userId = ref.watch(userPvdr).value?.uid ?? "";
-  final repo = ref.read(researcherRepoPvdr);
-  return ResearcherNotifier(repo, userId);
-});
