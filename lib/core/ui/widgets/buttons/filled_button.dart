@@ -10,7 +10,7 @@ class FilledButton extends StatelessWidget {
   FilledButton(
       {Key? key,
       required this.title,
-      this.spinner,
+      @Deprecated('preffer using loadingController') this.spinner,
       this.style = FilledButtonStyle.primary,
       required this.onPressed})
       : super(key: key) {

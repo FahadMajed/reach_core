@@ -15,9 +15,10 @@ class NotificationsSource {
   Future<void> unsubscribeFromTopic(String topic) async =>
       await _fcm!.unsubscribeFromTopic(topic);
 
-  Future<bool> isPermissionDetermined() async {
+  Future<bool> isPermissionNotDetermined() async {
     final notificationsSettings = await _fcm!.requestPermission(
       alert: false,
+      badge: false,
     );
     return notificationsSettings.authorizationStatus ==
         AuthorizationStatus.notDetermined;

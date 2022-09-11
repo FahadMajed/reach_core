@@ -26,6 +26,10 @@ class Researcher extends BaseModel<Researcher> {
     };
   }
 
+  toResearchMap() => toMap()
+    ..removeWhere((key, value) =>
+        key == 'currentResearchsIds' || key == 'customerId' || key == 'token');
+
   void addResearch(String researchId) => currentResearchsIds.add(researchId);
 
   factory Researcher.empty() => Researcher({

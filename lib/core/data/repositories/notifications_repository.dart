@@ -18,8 +18,13 @@ class NotificationsRepository {
     await source!.unsubscribeFromTopic(researchId);
   }
 
+  Future<void> unsubscribeFromChat(String chatId) async {
+    await source!.unsubscribeFromTopic(chatId);
+  }
+
   Future<void> subscribeToChat(String chatId) async {
-    await source!.subscribeToTopic(chatId);
+    await source!
+        .subscribeToTopic(chatId.replaceFirstMapped("+", (match) => ""));
   }
 
   Future<void> setDeviceToken() async {
@@ -37,8 +42,8 @@ class NotificationsRepository {
     }
   }
 
-  Future<bool> isPermissionDetermined() async =>
-      await source!.isPermissionDetermined();
+  Future<bool> isPermissionNotDetermined() async =>
+      await source!.isPermissionNotDetermined();
 
   Future<void> requestPermission() async => await source!.requestPermission();
 }

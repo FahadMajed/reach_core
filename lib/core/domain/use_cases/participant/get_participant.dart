@@ -1,5 +1,4 @@
 import 'package:reach_core/core/core.dart';
-import 'package:reach_research/domain/domain.dart';
 
 class GetParticipant extends UseCase<Participant, GetParticipantParams> {
   final ParticipantsRepository repository;

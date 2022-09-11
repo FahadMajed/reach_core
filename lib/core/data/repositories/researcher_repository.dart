@@ -8,7 +8,7 @@ class ResearcherRepository extends BaseRepository<Researcher, void>
   Future<void> addResearch(String researcherId, String researchId) async =>
       await updateFieldArrayUnion(
         researcherId,
-        'currentEnrollments',
+        'currentResearchsIds',
         [researchId],
       );
 
@@ -16,7 +16,7 @@ class ResearcherRepository extends BaseRepository<Researcher, void>
   Future<void> endResearch(String researcherId, String researchId) async {
     await updateFieldArrayRemove(
       researcherId,
-      'currentEnrollments',
+      'currentResearchsIds',
       [researchId],
     );
 
@@ -25,6 +25,14 @@ class ResearcherRepository extends BaseRepository<Researcher, void>
       'numberOfResearches',
     );
   }
+
+  @override
+  Future<void> removeResearch(String researcherId, String researchId) async =>
+      await updateFieldArrayRemove(
+        researcherId,
+        'currentResearchsIds',
+        [researchId],
+      );
 }
 
 final researcherRepoPvdr = Provider(

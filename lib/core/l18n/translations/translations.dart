@@ -1,2 +1,2 @@
-export 'ar_SA.dart';
-export 'en_US.dart';
+export 'ar_sa.dart';
+export 'en_us.dart';

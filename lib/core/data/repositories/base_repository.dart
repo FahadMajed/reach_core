@@ -51,8 +51,9 @@ abstract class BaseRepository<T, E> {
 
   ///updates [T] field
 
-  Future<void> updateField(String id, String field, dynamic newData) async =>
-      await _db.updateField(id, field, newData);
+  Future<void> updateField(String id, String field, dynamic newData) async {
+    if (await _db.docExists(id)) await _db.updateField(id, field, newData);
+  }
 
   ///updates [T]
 
@@ -65,7 +66,11 @@ abstract class BaseRepository<T, E> {
 
   ///deletes [T]
 
-  Future<void> delete(String id) async => await _db.deleteDocument(id);
+  Future<void> delete(String id) async {
+    if (await _db.docExists(id)) {
+      await _db.deleteDocument(id);
+    }
+  }
 
   ///used for updating an array in the source, by adding [union] to
   ///[T] [field]
@@ -121,6 +126,10 @@ abstract class BaseRepository<T, E> {
         parentId: id,
         data: data,
       );
+
+  @protected
+  Future<List<E>> getAllSubcollection(String parentId) async =>
+      await remoteDatabase.getAllSubcollection(parentId);
   @protected
   Future<void> addListToSubdocument(
     String id,

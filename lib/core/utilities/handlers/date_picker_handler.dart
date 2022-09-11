@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' as flutter;
-import 'package:get/route_manager.dart';
 import 'package:reach_core/core/core.dart';
 
 class DatePickerHandler {

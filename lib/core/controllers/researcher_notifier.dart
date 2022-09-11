@@ -19,34 +19,37 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
     _updateResearcher = updateResearcher;
 
     if (_uid.isNotEmpty) {
-      this.getResearcher(_uid);
+      this.getResearcher();
     }
   }
 
   @protected
   Researcher get researcher => state.value!;
 
-  Future<void> getResearcher(String id) async {
+  Future<void> getResearcher() async {
     state = const AsyncLoading();
     await _getResearcher
         .call(
-          GetResearcherParams(researcherId: id),
-        )
-        .then(
-          (researcher) => state = AsyncData(researcher),
-          onError: (e) => state = AsyncError(e),
-        );
+      GetResearcherParams(researcherId: _uid),
+    )
+        .then((researcher) => state = AsyncData(researcher), onError: (e) {
+      researcherLoaded();
+      state = AsyncError(e);
+    });
   }
 
-  Future<void> createResearcher(Researcher researcher) async =>
-      await _createResearcher
-          .call(
-            CreateResearcherParams(researcher: researcher),
-          )
-          .then(
-            (researcher) => state = AsyncData(researcher),
-            onError: (e) => state = AsyncError(e),
-          );
+  Future<void> createResearcher(Researcher researcher) async {
+    researcherLoading();
+    await _createResearcher
+        .call(
+      CreateResearcherParams(researcher: researcher),
+    )
+        .then((researcher) => state = AsyncData(researcher), onError: (e) {
+      researcherLoaded();
+      state = AsyncError(e);
+    });
+    researcherLoaded();
+  }
 
   Future<void> updateProfile({
     String? city,
@@ -56,24 +59,31 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
     String? imageUrl,
     List? chatsIds,
     List? researchsIds,
-  }) async =>
-      await _updateResearcher
-          .call(
-            UpdateResearcherParams(
-              updatedResearcher: _copyStateWith(
-                bio: bio,
-                name: name,
-                organization: org,
-                imageUrl: imageUrl,
-              ),
-              chatsIds: chatsIds,
-              researchsIds: researchsIds,
-            ),
-          )
-          .then(
-            (researcher) => state = AsyncData(researcher),
-            onError: (e) => state = AsyncError(e),
-          );
+  }) async {
+    researcherLoading();
+    await _updateResearcher
+        .call(
+      UpdateResearcherParams(
+        updatedResearcher: _copyStateWith(
+          bio: bio,
+          name: name,
+          organization: org,
+          imageUrl: imageUrl,
+          city: city,
+        ),
+        chatsIds: chatsIds,
+        researchsIds: researchsIds,
+      ),
+    )
+        .then(
+      (researcher) => state = AsyncData(researcher),
+      onError: (e) {
+        researcherLoaded();
+        state = AsyncError(e);
+      },
+    );
+    researcherLoaded();
+  }
 
   Researcher _copyStateWith(
           {String? id,
@@ -99,3 +109,8 @@ class ResearcherNotifier extends StateNotifier<AsyncValue<Researcher>> {
         },
       );
 }
+
+final RxBool isResearcherLoading = false.obs;
+
+void researcherLoading() => isResearcherLoading.value = true;
+Future<void> researcherLoaded() async => isResearcherLoading.value = false;

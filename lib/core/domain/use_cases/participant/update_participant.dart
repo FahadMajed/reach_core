@@ -1,6 +1,5 @@
 import 'package:reach_chats/repositories/chats_repository.dart';
 import 'package:reach_core/core/core.dart';
-import 'package:reach_research/data/repositories/enrollments_repository.dart';
 import 'package:reach_research/research.dart';
 
 class UpdateParticipant extends UseCase<Participant, UpdateParticipantParams> {

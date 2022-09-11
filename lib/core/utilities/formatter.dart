@@ -89,8 +89,6 @@ class Formatter {
     }
 
     return '$day, $month ${date?.day}';
-
-    return null;
   }
 
   static String parseDate(String dateTime) {

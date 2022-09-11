@@ -1,4 +1,4 @@
-import 'package:reach_research/domain/models/models.dart';
+import 'package:reach_research/research/domain/models/answer.dart';
 
 abstract class BaseParticipant {
   //CRUD +

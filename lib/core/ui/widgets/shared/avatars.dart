@@ -19,22 +19,31 @@ class Avatar extends StatelessWidget {
       child: Align(
         widthFactor: 1,
         heightFactor: 1,
-        child: ClipOval(
-          child: Image(
-            image: NetworkImage(link),
-            errorBuilder: (_, __, ___) => const EmptyAvatar(),
-            loadingBuilder: (_, child, event) {
-              if (event == null) {
-                return child;
-              } else {
-                return Loading(
-                    color: loadingColor,
-                    value: event.expectedTotalBytes != null
-                        ? (event.cumulativeBytesLoaded /
-                            event.expectedTotalBytes!.toDouble())
-                        : null);
-              }
-            },
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              width: 0.5,
+              color: Colors.grey[500]!,
+            ),
+          ),
+          child: ClipOval(
+            child: Image(
+              image: NetworkImage(link),
+              errorBuilder: (_, __, ___) => const EmptyAvatar(),
+              loadingBuilder: (_, child, event) {
+                if (event == null) {
+                  return child;
+                } else {
+                  return Loading(
+                      color: loadingColor,
+                      value: event.expectedTotalBytes != null
+                          ? (event.cumulativeBytesLoaded /
+                              event.expectedTotalBytes!.toDouble())
+                          : null);
+                }
+              },
+            ),
           ),
         ),
       ),

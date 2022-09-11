@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:reach_core/core/core.dart';
-import 'package:sizer/sizer.dart';
 
 class ReachScaffold extends StatelessWidget {
   final String? title;
   final AppBar? customAppBar;
-  final RxBool? spinner;
+
+  ///takes a list of possible asyncs calls
+  final List<RxBool>? loadingController;
   final CrossAxisAlignment alignment;
   final EdgeInsets outerPadding;
   final EdgeInsets innerPadding;
@@ -23,7 +22,7 @@ class ReachScaffold extends StatelessWidget {
   final bool withWhiteContainer;
   final List<Widget> innerChildren;
   final String imageFile;
-  final List<String> tabBarElements;
+
   final bool withAppBar;
   final bool withSafeArea;
   final bool resizeToAvoidBottomInset;
@@ -33,9 +32,8 @@ class ReachScaffold extends StatelessWidget {
     Key? key,
     this.title,
     this.customAppBar,
+    this.loadingController,
     this.imageFile = "",
-    this.spinner,
-    this.tabBarElements = const [],
     this.alignment = CrossAxisAlignment.start,
     this.outerPadding = padding8,
     this.innerPadding = padding8,
@@ -53,7 +51,7 @@ class ReachScaffold extends StatelessWidget {
     this.innerChildren = const [],
     this.withAppBar = true,
     this.withSafeArea = false,
-    this.resizeToAvoidBottomInset = true,
+    this.resizeToAvoidBottomInset = false,
   }) : super(key: key);
 
   final bodyFocusNode = FocusNode();
@@ -62,7 +60,7 @@ class ReachScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     try {
       final observable = false.obs;
-      if (tabBarElements.isNotEmpty || spinner != null) observable.value = true;
+      if (loadingController != null) observable.value = true;
       return observable.value
           ? Obx(
               () => buildScaffold(context),
@@ -75,7 +73,7 @@ class ReachScaffold extends StatelessWidget {
 
   ModalProgressHUD buildScaffold(BuildContext context) {
     return ModalProgressHUD(
-      inAsyncCall: spinner != null ? spinner!.value : false,
+      inAsyncCall: loadingController != null ? getLoadingState() : false,
       child: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(bodyFocusNode),
         child: Scaffold(
@@ -115,10 +113,6 @@ class ReachScaffold extends StatelessWidget {
         isScrollable
             ? LayoutSingleChild(
                 [
-                  if (tabBarElements.isNotEmpty)
-                    TabsBar(
-                      tabBarElements: tabBarElements,
-                    ),
                   if (beforeBody != null) beforeBody!,
                   container(),
                   expandedContainer,
@@ -182,5 +176,12 @@ class ReachScaffold extends StatelessWidget {
         if (innerChildren.isNotEmpty) DarkBlueContainer(innerChildren),
       ],
     );
+  }
+
+  bool getLoadingState() {
+    for (final loadingState in loadingController ?? []) {
+      if (loadingState.value == true) return true;
+    }
+    return false;
   }
 }

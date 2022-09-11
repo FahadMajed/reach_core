@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:reach_core/core/core.dart';
 
 class Toast {
@@ -7,6 +6,7 @@ class Toast {
     String message, {
     bool pop = false,
     int times = 1,
+    //TODO RENAME TO ONVISIBLE
     Function()? toggler,
   }) {
     ScaffoldMessenger.of(Get.context!).showSnackBar(

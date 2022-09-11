@@ -7,12 +7,13 @@ class ValueContainer extends StatelessWidget {
   final Function()? onLongPress;
   final String value;
   late bool addSpacer;
-  late IconData iconData;
+  late IconData? iconData;
 
   ValueContainer(
       {Key? key, this.onPressed, required this.value, this.onLongPress})
       : super(key: key) {
     addSpacer = false;
+    iconData = null;
   }
 
   ValueContainer.arrowRight(

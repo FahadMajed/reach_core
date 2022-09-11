@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:reach_core/core/core.dart';
-import 'package:sizer/sizer.dart';
 
 class BottomSheetContainer extends StatelessWidget {
   final List<Widget> children;

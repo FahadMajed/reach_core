@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 
-import '../translations/ar_SA.dart';
-import '../translations/en_US.dart';
+import '../translations/ar_sa.dart';
+import '../translations/en_us.dart';
 
 class TranslationService extends Translations {
-  static const enLocal = Locale("en", "SA");
-  static const arLocal = Locale("ar", "SA");
+  static const enLocal = Locale(
+    "en",
+  );
+  static const arLocal = Locale(
+    "ar",
+  );
 
   static final Map locales = {"English": enLocal, "Arabic": arLocal};
 

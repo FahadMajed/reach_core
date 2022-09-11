@@ -12,20 +12,24 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
 
   late final AddAnswers _addAnswers;
 
+  late final MarkRejected _markRejected;
+
   ParticipantNotifier({
     required String uid,
     required UpdateParticipant updateParticipant,
     required GetParticipant getParticipant,
     required CreateParticipant createParticipant,
     required AddAnswers addAnswers,
+    required MarkRejected markRejected,
   }) : super(const AsyncLoading()) {
     _uid = uid;
     _updatePartcipant = updateParticipant;
     _getParticipant = getParticipant;
     _createParticipant = createParticipant;
     _addAnswers = addAnswers;
+    _markRejected = markRejected;
     if (_uid.isNotEmpty) {
-      this.getParticipant(_uid);
+      this.getParticipant();
     }
   }
 
@@ -33,18 +37,19 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
   // List get _enrollmentHistory => _participant.enrollmentHistory;
   // List get _currentEnrollments => _participant.currentEnrollments;
   Map<String, Criterion> get criteria => _participant.criteria!;
-  List get _missingCriteria => _participant.missingCriteria;
 
-  Future<void> getParticipant(String _uid) async {
-    state = const AsyncLoading();
+  Future<void> getParticipant() async {
+    participantLoading();
+    print(_uid);
     await _getParticipant
         .call(
-          GetParticipantParams(participantId: _uid),
-        )
-        .then(
-          (participant) => state = AsyncData(participant),
-          // onError: (e) => state = AsyncError(e),
-        );
+      GetParticipantParams(participantId: _uid),
+    )
+        .then((participant) => state = AsyncData(participant), onError: (e) {
+      participantLoaded();
+      return state = AsyncError(e);
+    });
+    participantLoaded();
   }
 
   Future<void> updateProfile({
@@ -53,21 +58,24 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     String? imageUrl,
     List? chatsIds,
     List? researchsIds,
-  }) async =>
-      await _updatePartcipant
-          .call(UpdateParticipantParams(
-            updatedParticipant: copyStateWith(
-              name: name,
-              criteria: myCriteria,
-              imageUrl: imageUrl,
-            ),
-            researchsIds: researchsIds,
-            chatsIds: chatsIds,
-          ))
-          .then(
-            (participant) => state = AsyncData(participant),
-            onError: (e) => state = AsyncError(e),
-          );
+  }) async {
+    participantLoading();
+    await _updatePartcipant
+        .call(UpdateParticipantParams(
+          updatedParticipant: copyStateWith(
+            name: name,
+            criteria: myCriteria,
+            imageUrl: imageUrl,
+          ),
+          researchsIds: researchsIds,
+          chatsIds: chatsIds,
+        ))
+        .then(
+          (participant) => state = AsyncData(participant),
+          onError: (e) => onParticipantError(e),
+        );
+    participantLoaded();
+  }
 
   Future<void> insertAnswers(
     List<Answer> answers,
@@ -81,19 +89,38 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
         ),
       );
 
-  Future<void> createParticipant(Participant participant) async =>
-      _createParticipant
-          .call(
-            CreateParticipantParams(participant: participant),
-          )
-          .then(
-            (participant) => state = AsyncData(participant),
-            onError: (e) => state = AsyncError(e),
-          );
+  Future<void> createParticipant(Participant participant) async {
+    participantLoading();
+    _createParticipant
+        .call(
+          CreateParticipantParams(participant: participant),
+        )
+        .then(
+          (participant) => state = AsyncData(participant),
+          onError: (e) => onParticipantError(e),
+        );
+    participantLoaded();
+  }
+
+  Future<void> markRejected(String researchId) async {
+    participantLoading();
+    await _markRejected
+        .call(
+          MarkRejectedParams(
+            researchId: researchId,
+            participant: _participant,
+          ),
+        )
+        .then(
+          (participant) => state = AsyncData(participant),
+          onError: (e) => onParticipantError(e),
+        );
+    participantLoaded();
+  }
 
   void setMissingCriteria(Map<String, Criterion> researchCriteria) {
     state = AsyncData(copyStateWith(missingCriteria: []));
-
+    List missingCriteria = [];
     for (String criterionName in researchCriteria.keys) {
       if (researchCriteria[criterionName] is RangeCriterion) {
         final partiallyTrue = _inRangeCriterion(
@@ -102,16 +129,16 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
         );
 
         if (partiallyTrue != null) {
-          _missingCriteria.add(criterionName);
+          missingCriteria.add(criterionName);
         }
       } else if ((criteria[criterionName] as ValueCriterion)
           .condition
           .isEmpty) {
-        _missingCriteria.add(criterionName);
+        missingCriteria.add(criterionName);
       }
     }
 
-    state = AsyncData(copyStateWith(missingCriteria: _missingCriteria));
+    state = AsyncData(copyStateWith(missingCriteria: missingCriteria));
   }
 
   /// this method will not execute except participant might be logically eliglble,
@@ -167,6 +194,7 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     String criterionName,
     Criterion currentCriterion,
   ) async {
+    participantLoading();
     final Map<String, Criterion> _criteria = _participant.criteria!;
     if (currentCriterion is RangeCriterion) {
       _criteria.addAll(_compareBothSides(criterionName, currentCriterion));
@@ -181,8 +209,9 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
         )
         .then(
           (participant) => state = AsyncData(participant),
-          onError: (e) => state = AsyncError(e),
+          onError: (e) => onParticipantError(e),
         );
+    participantLoaded();
   }
 
   Map<String, Criterion> _compareBothSides(
@@ -239,6 +268,50 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
     return isMatched;
   }
 
+  Future<void> onSurveyAnswer({
+    required Question question,
+    required bool actualAnswer,
+    required bool expectedAnswer,
+  }) async {
+    if (question.isCriterionQuestion == false) {
+      //anyways, we want to register the answer.
+      await insertAnswers(
+        [
+          Answer(
+              myAnswer: actualAnswer,
+              expectedAnswer: expectedAnswer,
+              question: question.questionText)
+        ],
+        "ResearchId",
+      );
+    } else if (question.expectedAnswer == actualAnswer) {
+      //if it is true, then update me
+      await updateCriterion(
+        question.criterion!.name,
+        question.criterion!,
+      );
+    }
+    //if it is false and gender, we want to invert the gender.
+
+    else if (question.criterion!.name == "gender") {
+      final value = question.criterion as ValueCriterion;
+      await updateCriterion(
+        question.criterion!.name,
+        value.copyWith(
+          condition: value.condition == "Male" ? "Female" : "Male",
+        ),
+      );
+    }
+  }
+
+  void onParticipantError(e) {
+    participantLoaded();
+    throw e;
+  }
+
+  void updateCriteria(Map<String, Criterion> updatedCriteria) =>
+      state = AsyncValue.data(copyStateWith(criteria: updatedCriteria));
+
   Participant copyStateWith({
     String? participantId,
     String? name,
@@ -271,3 +344,8 @@ class ParticipantNotifier extends StateNotifier<AsyncValue<Participant>> {
         },
       );
 }
+
+final RxBool isPartLoading = false.obs;
+
+void participantLoading() => isPartLoading.value = true;
+Future<void> participantLoaded() async => isPartLoading.value = false;

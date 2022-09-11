@@ -69,6 +69,14 @@ class RemoteDatabase<T, E> {
   Future<void> updateDocument(T object, String id) async =>
       await _collection.doc(id).update(_toMap(object, null));
 
+  Future<void> updateDocumentRaw(Map<String, Object?> data, String id) async =>
+      await _collection.doc(id).update(data);
+
+  Future<bool> docExists(String docId) async =>
+      await _collection.doc(docId).get().then((doc) => doc.exists)
+          ? true
+          : false;
+
   ///deletes document by id
   Future<void> deleteDocument(String id) async =>
       await _collection.doc(id).delete();
@@ -79,9 +87,11 @@ class RemoteDatabase<T, E> {
     String field,
     List union,
   ) async =>
-      await _collection
-          .doc(docId)
-          .update({field: FieldValue.arrayUnion(union)});
+      await docExists(docId)
+          ? await _collection
+              .doc(docId)
+              .update({field: FieldValue.arrayUnion(union)})
+          : null;
 
   Future<void> updateField(
     String docId,
@@ -122,6 +132,19 @@ class RemoteDatabase<T, E> {
     required E data,
   }) async =>
       await getSubCollection(parentId).doc(subDocId).set(data);
+
+  Future<void> updateSubdocField(
+    String parentId,
+    String docId,
+    String field,
+    dynamic data,
+  ) async =>
+      await getSubCollection(parentId).doc(docId).update({field: data});
+
+  Future<List<E>> getAllSubcollection(String parentId) async =>
+      await getSubCollection(parentId)
+          .get()
+          .then((query) => query.docs.map((e) => e.data()).toList());
 
   ///GENERATES ID FOR DOC
   Future<String> createSubdocumentNoId({
@@ -171,7 +194,9 @@ class RemoteDatabase<T, E> {
       .snapshots()
       .map((value) => value.docs.map((e) => e.data()).toList());
 
-  Future<void> incrementField(String docId, String field) async {
-    await _collection.doc(docId).update({field: FieldValue.increment(1)});
-  }
+  Future<void> incrementField(String docId, String field) async =>
+      await _collection.doc(docId).update({field: FieldValue.increment(1)});
+
+  Future<void> decrementField(String docId, String field) async =>
+      await _collection.doc(docId).update({field: FieldValue.increment(-1)});
 }

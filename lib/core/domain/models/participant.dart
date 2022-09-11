@@ -1,6 +1,7 @@
 import 'package:reach_research/research.dart';
 
 import 'base_model.dart';
+import 'package:reach_core/core/core.dart';
 
 class Participant extends BaseModel<Participant> {
   Participant(Map<String, dynamic> jSON) : super(jSON);
@@ -19,7 +20,8 @@ class Participant extends BaseModel<Participant> {
   List<Answer> get answers =>
       (data['answers'] as List).map((e) => Answer.fromMap(e)).toList();
 
-  List get missingCriteria => data['missingCriteria'];
+  List<String> get missingCriteria =>
+      [for (final e in data['missingCriteria'] ?? []) e.toString()];
 
   int get defaultColor => data['defaultColor'];
 
@@ -44,12 +46,12 @@ class Participant extends BaseModel<Participant> {
         },
       );
 
-  factory Participant.init(String uid) =>
-      Participant.empty().copyWith({'participantId': uid});
+  factory Participant.init(String uid) => Participant.empty().copyWith(
+      {'participantId': uid, 'name': 'Participant #${uid.substring(0, 4)}'});
 
   factory Participant.empty() => Participant({
         'participantId': '',
-        'defaultColor': 0xFFFFFF,
+        'defaultColor': ColorGenerator.getRandomColor().value,
         'criteria': criteriaEmptyStateRanges.map(
           (key, criterion) => MapEntry(
             key,
@@ -63,7 +65,7 @@ class Participant extends BaseModel<Participant> {
         'currentEnrollments': const [],
         'name': "Participant",
         'walletBalance': 0,
-        'missingCriteria': const []
+        'missingCriteria': const <String>[]
       });
 
   @override
@@ -78,4 +80,33 @@ class Participant extends BaseModel<Participant> {
 
   ///returns sub-set of participants data, used for duplications
   Participant get partial => Participant(toPartialMap());
+
+  bool isMatched(Map<String, Criterion> researchCriteria) {
+    bool isMatched = true;
+
+    for (final researchCriterion in researchCriteria.values) {
+      if (researchCriterion is ValueCriterion) {
+        ValueCriterion myCriterion =
+            criteria![researchCriterion.name] as ValueCriterion;
+
+        if (myCriterion.condition != researchCriterion.condition &&
+            myCriterion.condition.isNotEmpty) {
+          isMatched = false;
+          break;
+        }
+      } else if (researchCriterion is RangeCriterion) {
+        RangeCriterion myCriterion =
+            criteria![researchCriterion.name] as RangeCriterion;
+
+        if (myCriterion.from > researchCriterion.to) {
+          isMatched = false;
+          break;
+        } else if (myCriterion.to < researchCriterion.from) {
+          isMatched = false;
+          break;
+        }
+      }
+    }
+    return isMatched;
+  }
 }
