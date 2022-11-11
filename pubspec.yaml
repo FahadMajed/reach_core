@@ -9,12 +9,28 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+
   reach_research:
-    path: /Users/fahad/AndroidStudioProjects/reach_researchers/packages/reach_research
+    git: 
+      url: https://github.com/FahadMajed/reach_research
+      ref: dev
   reach_chats:
-    path: /Users/fahad/AndroidStudioProjects/reach_researchers/packages/reach_chats
+    git: 
+      url: https://github.com/FahadMajed/reach_chats
+      ref: dev
   reach_auth:
-    path: /Users/fahad/AndroidStudioProjects/reach_researchers/packages/reach_auth
+    git: 
+      url: https://github.com/FahadMajed/reach_auth
+      ref: dev
+
+
+  # reach_research:
+  #   path: /Users/fahad/AndroidStudioProjects/reach_researchers/packages/reach_research
+  # reach_chats:
+  #   path: /Users/fahad/AndroidStudioProjects/reach_researchers/packages/reach_chats
+  # reach_auth:
+  #   path: /Users/fahad/AndroidStudioProjects/reach_researchers/packages/reach_auth
   
 
 
